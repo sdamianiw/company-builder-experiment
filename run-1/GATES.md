@@ -6,7 +6,7 @@ Single source of truth for gate status. Updated at every phase close; a RED gate
 |------|------|----------------|--------------------|--------|
 | G0 | RED | Media pipeline proven end-to-end (HTML→frames→TTS→mp4→frame re-extract) | `run-1/tools/*` smoke, BUILD-LOG 2026-07-11 | **PASS** (d1ad632) |
 | G-R1 | RED | Session recovery reconciled + checkpointed | `git status --short` → empty | **PASS** (44b1ce0) |
-| G1 | RED | ≥4 VERIFIED buildable pain-wedges, primary evidence, live URLs | round-2b workflow `verifiedCount` + `evidence/verification/r2-*.md` | **FAIL r1 (0/8) → round 2b IN PROGRESS** |
+| G1 | RED | ≥4 VERIFIED buildable pain-wedges, primary evidence, live URLs | round-2b workflow `verifiedCount` + `evidence/verification/r2-*.md` | **CLOSED 2026-07-23: 2 VERIFIED (Square-SOAP, Etsy-COGS) via decision rule 2–3 branch; prompt-library cut. Evidence: verification/r2-rank-{1,3}-narrowed.md** |
 | G2 | RED | Winner chosen via scored tournament; every pitch claim URL-verified | tournament workflow return + BUILD-LOG entry | pending |
 | G3a | RED | Business thesis claims 100% URL-traced | skeptic pass on thesis | pending |
 | G3b | AMBER | Brand guidelines complete (stranger test) + voice-rules.md exists | checklist in brand/ | pending |
