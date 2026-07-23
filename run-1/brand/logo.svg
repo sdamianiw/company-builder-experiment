@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" width="192" height="44" role="img" aria-label="BatchCOGS wordmark">
+  <title>BatchCOGS</title>
+
+  <!--
+    Mark: stacked recipe/ledger cards
+    Two offset cards = "batch" (plural). Three amber-bulleted ledger lines.
+    Third line shorter = an entry in progress, not a static icon.
+    Primary color: Ink #1C3D52
+    Accent: Amber #D4911F
+  -->
+
+  <!-- Back card — offset right-down to read as a stack -->
+  <rect x="7" y="7" width="29" height="33" rx="2" fill="#1C3D52" opacity="0.30"/>
+
+  <!-- Front card -->
+  <rect x="3" y="3" width="29" height="33" rx="2" fill="#1C3D52"/>
+
+  <!-- Row 1: amber bullet + full ledger line -->
+  <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+  <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+
+  <!-- Row 2: amber bullet + full ledger line -->
+  <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+  <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+
+  <!-- Row 3: amber bullet + partial line (entry in progress) -->
+  <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+  <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#F0F3F5" opacity="0.60"/>
+
+  <!--
+    Wordmark
+    Font: DM Sans (Google Fonts). Fallback stack chosen for geometric similarity
+    across platforms: Gill Sans MT (Windows), Century Gothic, system-ui.
+    "Batch" at weight 600 — confident, primary.
+    "COGS" at weight 300 — light, contrasting, accounting-precise.
+    Weight contrast is the wordmark's single identifying typographic move.
+  -->
+  <text y="30"
+        font-family="'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif"
+        font-size="21.5"
+        letter-spacing="-0.2">
+    <tspan x="46" font-weight="600" fill="#1C3D52">Batch</tspan><tspan
+           font-weight="300" fill="#1C3D52" letter-spacing="1.2">COGS</tspan>
+  </text>
+</svg>

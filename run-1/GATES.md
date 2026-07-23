@@ -8,9 +8,9 @@ Single source of truth for gate status. Updated at every phase close; a RED gate
 | G-R1 | RED | Session recovery reconciled + checkpointed | `git status --short` → empty | **PASS** (44b1ce0) |
 | G1 | RED | ≥4 VERIFIED buildable pain-wedges, primary evidence, live URLs | round-2b workflow `verifiedCount` + `evidence/verification/r2-*.md` | **CLOSED 2026-07-23: 2 VERIFIED (Square-SOAP, Etsy-COGS) via decision rule 2–3 branch; prompt-library cut. Evidence: verification/r2-rank-{1,3}-narrowed.md** |
 | G2 | RED | Winner chosen via scored tournament; every pitch claim URL-verified | tournament workflow return + BUILD-LOG entry | **PASS 2026-07-23: BatchLedger 3–0; 1 claim flag corrected (see BUILD-LOG)** |
-| G3a | RED | Business thesis claims 100% URL-traced | skeptic pass on thesis | pending |
-| G3b | AMBER | Brand guidelines complete (stranger test) + voice-rules.md exists | checklist in brand/ | pending |
-| G3c | AMBER | Domain availability checked via RDAP, receipt saved | evidence file | pending |
+| G3a | RED | Business thesis claims 100% URL-traced | skeptic pass on thesis | **PASS 2026-07-23 (after fixing 3 flags; see BUILD-LOG + verification/thesis-check.md)** |
+| G3b | AMBER | Brand guidelines complete (stranger test) + voice-rules.md exists | checklist in brand/ | **PASS 2026-07-23 (guidelines, 2 logos, voice-rules w/ inference label)** |
+| G3c | AMBER | Domain availability checked via RDAP, receipt saved | evidence file | **PASS 2026-07-23: batchcogs.com RDAP 404 (available), receipts in brand/naming.md** |
 | G4 | RED | Site opens locally, 390px+1440px screenshots reviewed, 0 console errors | `node tools/screenshot.mjs` (exit 3 on console errors) | pending |
 | G5 | RED | Both videos render, play, frames watched | `tools/encode-video.mjs` VERIFY + frame review | pending |
 | G5b | AMBER | Founder script passes voice-rules checklist | brand/voice-rules.md checklist | pending |
