@@ -1,0 +1,1221 @@
+/*
+ * =========================================================
+ * BatchCOGS — Shared Stylesheet  v1.0  2026-07-23
+ * =========================================================
+ * NOTE: LIGHT THEME ONLY — intentional design decision.
+ * The brand commits to a single visual world: ledger-precise,
+ * considered, stable. This is a choice, not an omission.
+ *
+ * ─── NAV HTML SNIPPET ─────────────────────────────────────
+ * Copy verbatim into every page <body> as the first element.
+ * The markup below is the canonical nav; do not alter structure,
+ * only update href values and the .is-current class per page.
+ *
+ * <header class="site-header" id="site-header">
+ *   <div class="site-header__inner">
+ *     <a href="index.html" class="site-header__logo" aria-label="BatchCOGS home">
+ *       <!-- Paste the full content of /brand/logo.svg here.
+ *            Override display size via .site-header__logo svg { width: 140px; height: auto; } -->
+ *     </a>
+ *     <nav aria-label="Main navigation">
+ *       <ul class="nav-list" id="nav-list">
+ *         <li><a href="demo.html"    class="nav-link">Try the demo</a></li>
+ *         <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+ *         <li><a href="compare.html" class="nav-link">Compare</a></li>
+ *         <li><a href="switch.html"  class="nav-link">Switch from Stocksmith</a></li>
+ *       </ul>
+ *     </nav>
+ *     <a href="demo.html" class="btn btn--outline nav-cta">Try the demo</a>
+ *     <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-list">
+ *       <span></span><span></span><span></span>
+ *     </button>
+ *   </div>
+ * </header>
+ *
+ * ─── FOOTER HTML SNIPPET ──────────────────────────────────
+ * Copy verbatim as the last element before </body> on every page.
+ *
+ * <footer class="site-footer">
+ *   <div class="site-footer__inner">
+ *     <a href="index.html" class="site-footer__logo" aria-label="BatchCOGS home">
+ *       <!-- Dark-variant logo: same SVG as logo.svg with these color swaps:
+ *            - rect fills: #1C3D52 → #F0F3F5
+ *            - ledger line fills: #F0F3F5 → #1C3D52 (opacity unchanged)
+ *            - Amber bullet fills: unchanged
+ *            - wordmark tspan fills: #1C3D52 → #F0F3F5
+ *       -->
+ *     </a>
+ *     <nav aria-label="Footer navigation" class="site-footer__nav">
+ *       <a href="demo.html"    class="footer-link">Try the demo</a>
+ *       <a href="pricing.html" class="footer-link">Pricing</a>
+ *       <a href="compare.html" class="footer-link">Compare</a>
+ *       <a href="switch.html"  class="footer-link">Switch from Stocksmith</a>
+ *     </nav>
+ *     <p class="t-caption site-footer__copy">
+ *       &copy; 2026 BatchCOGS &middot;
+ *       <a href="mailto:hello@batchcogs.com" class="footer-link">hello@batchcogs.com</a>
+ *     </p>
+ *   </div>
+ * </footer>
+ *
+ * ─── CSS CLASS CONVENTIONS ────────────────────────────────
+ *
+ * Layout
+ *   .container          max-width 1200px, centered, clamp(20px,5vw,48px) H-pad
+ *   .section            vertical section, --section-pad top & bottom
+ *   .section--dark      Void (#0D1E28) bg, Fog text; resets link/text colors
+ *   .section--paper     Paper (#E4EBF0) bg
+ *   .grid-2             2-col ≥768px, 1-col below; gap --sp-6
+ *   .grid-3             3-col ≥900px, 1-col below; gap --sp-6
+ *   .grid-4             4-col ≥960px, 2-col ≥520px, 1-col below; gap --sp-6
+ *
+ * Typography (apply to the element that wraps the text)
+ *   .t-display          3rem   DM Serif Display  lh 1.10  ls -0.02em  hero only
+ *   .t-h1               2.25rem DM Serif Display  lh 1.15  ls -0.015em
+ *   .t-h2               1.625rem DM Serif Display lh 1.25  ls -0.01em
+ *   .t-h3               1.125rem DM Sans 600       lh 1.35  ls -0.005em
+ *   .t-body-lg          1.0625rem DM Sans 400      lh 1.65
+ *   .t-body             1rem     DM Sans 400        lh 1.60
+ *   .t-body-sm          0.875rem DM Sans 400        lh 1.55
+ *   .t-label            0.75rem  DM Sans 500        lh 1.40  ls 0.06em
+ *   .t-caption          0.6875rem DM Sans 400       lh 1.45  ls 0.04em
+ *   .t-mono             0.875rem IBM Plex Mono 400  lh 1.50  tabular-nums
+ *   .t-mono-lg          1.125rem IBM Plex Mono 500  lh 1.30  tabular-nums
+ *
+ * Navigation
+ *   .site-header        sticky top, Fog bg, 1px Paper bottom border, z-index 100
+ *   .site-header__inner flex row, space-between, height --nav-height, max-width
+ *   .site-header__logo  logo anchor; contains inline SVG
+ *   .nav-list           ul reset, flex row, gap 4px; hidden below 768px
+ *   .nav-link           Slate text, hover Ink + underline; .is-current Ink + underline
+ *   .nav-cta            Amber-border outline button; hidden below 768px
+ *   .nav-toggle         hamburger; hidden ≥768px; .nav-open on .site-header opens menu
+ *
+ * Buttons
+ *   .btn                DM Sans 500 0.875rem, 10px 22px, no border-radius
+ *   .btn--primary       Ink bg, Fog text; hover #24404F bg
+ *   .btn--outline       transparent bg, 1.5px solid Amber border, Ink text; hover Paper bg
+ *   .btn--ghost         transparent bg, 1px solid Paper border, Ink text; hover Paper bg
+ *   .btn--full          width 100%
+ *
+ * Cards
+ *   .card               Paper bg, 24px pad, 2px radius, 1px Paper border
+ *   .card--ink          Ink bg, Fog text (pricing highlight card)
+ *
+ * Tables
+ *   .table-wrap         overflow-x:auto wrapper — do NOT put overflow on the table itself
+ *   .data-table         full-width, border-collapse, tabular-nums
+ *   .td-mono            IBM Plex Mono cell for prices / counts
+ *   .td-check / .td-cross   check ✓ / dash — cells for boolean feature columns
+ *   .row--highlight     subtle Paper bg for the BatchCOGS row
+ *
+ * Utility
+ *   .section-label      t-label + Slate color + 8px bottom margin
+ *   .source-link        Slate, underline, hover Ink
+ *   .link-arrow         Ink, no underline, hover Amber, used for "See full X →"
+ *   .amber-rule         2px solid Amber left border + 12px left pad (pull-quotes)
+ *   .text-slate         color: var(--color-slate)
+ *
+ * =========================================================
+ */
+
+/* ─── 1. DESIGN TOKENS ──────────────────────────────────── */
+:root {
+  /* Brand palette */
+  --color-ink:   #1C3D52;
+  --color-amber: #D4911F;
+  --color-fog:   #F0F3F5;
+  --color-void:  #0D1E28;
+  --color-slate: #7A9BAA;
+  --color-paper: #E4EBF0;
+
+  /* Derived card color for dark sections */
+  --color-ink-card: #162A38;
+  --color-ink-border: #24404F;
+
+  /* Status (semantic — not accent) */
+  --color-success: #2A7A4A;
+  --color-error:   #A0291E;
+
+  /* Spacing (4px grid) */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Typography */
+  --font-display: 'DM Serif Display', 'Georgia', serif;
+  --font-body:    'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+
+  /* Layout */
+  --container-max: 1200px;
+  --container-pad: clamp(var(--sp-5), 5vw, var(--sp-12));
+  --section-pad:   var(--sp-16);
+  --nav-height:    64px;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --section-pad: var(--sp-12);
+  }
+}
+
+/* ─── 2. RESET & BASE ───────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-fog);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--color-ink);
+  text-decoration-color: var(--color-amber);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ─── 3. TYPOGRAPHY SCALE ───────────────────────────────── */
+.t-display {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 1.10;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.t-h1 {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.t-h2 {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.t-h3 {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+.t-body-lg {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.t-body-sm {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.t-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: none; /* sentence case always */
+}
+
+.t-caption {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-mono-lg {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Constrain prose measure */
+.prose {
+  max-width: 68ch;
+}
+
+/* ─── 4. LAYOUT ─────────────────────────────────────────── */
+.container {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.section {
+  padding-block: var(--section-pad);
+  background-color: var(--color-fog);
+}
+
+.section--paper {
+  background-color: var(--color-paper);
+}
+
+.section--dark {
+  background-color: var(--color-void);
+  color: var(--color-fog);
+}
+
+.section--dark .t-h2,
+.section--dark .t-h1,
+.section--dark .t-display {
+  color: var(--color-fog);
+}
+
+.section--dark .section-label {
+  color: var(--color-slate);
+}
+
+.section--dark p,
+.section--dark li {
+  color: var(--color-fog);
+}
+
+.section--dark a {
+  color: var(--color-fog);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 520px) {
+  .grid-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ─── 5. NAVIGATION ─────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-fog);
+  border-bottom: 1px solid var(--color-paper);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-height);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  gap: var(--sp-4);
+}
+
+.site-header__logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.site-header__logo svg {
+  width: 140px;
+  height: auto;
+}
+
+.nav-list {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.nav-link {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-slate);
+  text-decoration: none;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 1px;
+  transition: color 0.15s ease;
+}
+
+.nav-link:hover,
+.nav-link.is-current {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-amber);
+  text-underline-offset: 3px;
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+}
+
+.nav-cta {
+  display: none;
+  flex-shrink: 0;
+}
+
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: var(--sp-10);
+  height: var(--sp-10);
+  padding: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.nav-toggle span {
+  display: block;
+  height: 1.5px;
+  background-color: var(--color-ink);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform-origin: center;
+}
+
+/* Mobile nav open state */
+.nav-open .nav-list {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  background-color: var(--color-fog);
+  border-bottom: 1px solid var(--color-paper);
+  padding: var(--sp-4) var(--container-pad);
+  gap: var(--sp-2);
+  align-items: flex-start;
+}
+
+.nav-open .nav-list li {
+  width: 100%;
+}
+
+.nav-open .nav-link {
+  display: block;
+  padding: var(--sp-3) 0;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--color-paper);
+}
+
+.nav-open .nav-toggle span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.nav-open .nav-toggle span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.nav-open .nav-toggle span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+@media (min-width: 768px) {
+  .nav-list {
+    display: flex;
+  }
+
+  .nav-cta {
+    display: inline-flex;
+  }
+
+  .nav-toggle {
+    display: none;
+  }
+}
+
+/* ─── 6. BUTTONS ────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 10px 22px;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+}
+
+.btn--primary {
+  background-color: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-fog);
+}
+
+.btn--primary:hover {
+  background-color: var(--color-ink-border);
+  border-color: var(--color-ink-border);
+  color: var(--color-fog);
+  text-decoration: none;
+}
+
+.btn--outline {
+  background-color: transparent;
+  border-color: var(--color-amber);
+  color: var(--color-ink);
+}
+
+.btn--outline:hover {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.btn--ghost {
+  background-color: transparent;
+  border-color: var(--color-slate);
+  color: var(--color-ink);
+}
+
+.btn--ghost:hover {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.btn--full {
+  width: 100%;
+}
+
+/* Button variant on dark backgrounds */
+.section--dark .btn--ghost {
+  border-color: var(--color-ink-border);
+  color: var(--color-fog);
+}
+
+.section--dark .btn--ghost:hover {
+  background-color: var(--color-ink-card);
+  color: var(--color-fog);
+}
+
+/* ─── 7. CARDS ──────────────────────────────────────────── */
+.card {
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-paper);
+  border-radius: var(--sp-1);
+  padding: var(--sp-6);
+}
+
+.card--ink {
+  background-color: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-fog);
+}
+
+.card--ink .t-h3,
+.card--ink p,
+.card--ink li {
+  color: var(--color-fog);
+}
+
+/* ─── 8. TABLES ─────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-paper);
+  border-radius: var(--sp-1);
+  margin-block: var(--sp-6);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-slate);
+  text-align: left;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--color-paper);
+  background-color: var(--color-fog);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--color-paper);
+  vertical-align: top;
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover td {
+  background-color: var(--color-fog);
+}
+
+.td-mono {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.td-check {
+  color: var(--color-success);
+  font-size: 0.875rem;
+}
+
+.td-cross {
+  color: var(--color-slate);
+  font-size: 0.875rem;
+}
+
+.row--highlight td {
+  background-color: var(--color-paper);
+}
+
+.row--highlight:hover td {
+  background-color: var(--color-paper);
+}
+
+/* ─── 9. UTILITY ────────────────────────────────────────── */
+.section-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-slate);
+  margin-bottom: var(--sp-2);
+}
+
+.source-link {
+  color: var(--color-slate);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-size: inherit;
+}
+
+.source-link:hover {
+  color: var(--color-ink);
+  text-decoration-color: var(--color-amber);
+}
+
+.link-arrow {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  transition: color 0.15s ease;
+}
+
+.link-arrow:hover {
+  color: var(--color-amber);
+  text-decoration: none;
+}
+
+.amber-rule {
+  border-left: 2px solid var(--color-amber);
+  padding-left: var(--sp-4);
+}
+
+.text-slate {
+  color: var(--color-slate);
+}
+
+/* ─── 10. SITE HEADER ───────────────────────────────────── */
+/* (structure defined in §5; site-header positional rules here) */
+.site-header {
+  /* Ensure mobile menu positions relative to header */
+  position: sticky;
+  top: 0;
+}
+
+/* ─── 11. HERO SECTION ──────────────────────────────────── */
+.hero-section {
+  padding-block-start: var(--sp-16);
+  padding-block-end: var(--sp-12);
+  border-bottom: 1px solid var(--color-paper);
+}
+
+.hero-section .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  max-width: 800px;
+}
+
+.hero-headline {
+  max-width: 720px;
+}
+
+.hero-subhead {
+  max-width: 640px;
+  color: var(--color-ink);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+.hero-proof {
+  color: var(--color-slate);
+  max-width: 48ch;
+}
+
+/* Mobile hero adjustments */
+@media (max-width: 600px) {
+  .t-display {
+    font-size: 2.25rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+}
+
+/* ─── 12. VILLAIN / DISPLACEMENT SECTION ───────────────── */
+.villain-section {
+  border-top: none;
+  border-bottom: none;
+}
+
+.villain-section .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.villain-lead {
+  max-width: 640px;
+}
+
+.villain-subtext {
+  max-width: 620px;
+  opacity: 0.85;
+}
+
+.quote-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 768px) {
+  .quote-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pull-quote {
+  padding: var(--sp-5) var(--sp-5) var(--sp-5) var(--sp-5);
+  border-left: 2px solid var(--color-amber);
+  padding-left: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.pull-quote p {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--color-fog);
+  font-style: italic;
+}
+
+.pull-quote cite {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--color-slate);
+  font-style: normal;
+}
+
+.pull-quote cite a {
+  color: var(--color-slate);
+}
+
+.villain-footnote {
+  color: var(--color-slate);
+  max-width: 640px;
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--color-ink-border);
+}
+
+/* ─── 13. HOW IT WORKS ──────────────────────────────────── */
+.how-section .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 520px) {
+  .how-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .how-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.how-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--color-paper);
+}
+
+.how-step__num {
+  color: var(--color-amber);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.how-step p {
+  color: var(--color-ink);
+}
+
+/* ─── 14. COMPARISON SECTION ────────────────────────────── */
+.compare-section .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.compare-section .t-h2 {
+  max-width: 480px;
+}
+
+/* ─── 15. PRICING SECTION ───────────────────────────────── */
+.pricing-section .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-5);
+  align-items: start;
+}
+
+@media (min-width: 640px) {
+  .pricing-grid {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+  }
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.pricing-card__tier {
+  color: var(--color-slate);
+  text-transform: none;
+  letter-spacing: 0.06em;
+}
+
+.card--ink .pricing-card__tier {
+  color: var(--color-slate);
+}
+
+.pricing-card__price {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.card--ink .pricing-card__price {
+  color: var(--color-fog);
+}
+
+.pricing-card__unit {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-slate);
+}
+
+.card--ink .pricing-card__unit {
+  color: var(--color-slate);
+}
+
+.pricing-card__period {
+  color: var(--color-slate);
+  margin-top: calc(-1 * var(--sp-2));
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  flex: 1;
+}
+
+.feature-list li {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-ink);
+  padding-left: var(--sp-4);
+  position: relative;
+}
+
+.feature-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--color-amber);
+}
+
+.card--ink .feature-list li {
+  color: var(--color-fog);
+}
+
+.card--ink .feature-list li::before {
+  background-color: var(--color-amber);
+}
+
+.pricing-compare-note {
+  max-width: 56ch;
+}
+
+/* ─── 16. FAQ SECTION ───────────────────────────────────── */
+.faq-section .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.faq-header {
+  max-width: 480px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 720px;
+  border-top: 1px solid var(--color-ink);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--color-paper);
+}
+
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-5) 0;
+  gap: var(--sp-4);
+  user-select: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-question {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-ink);
+  letter-spacing: -0.005em;
+}
+
+.faq-item summary::after {
+  content: '+';
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: var(--color-amber);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.faq-item[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq-answer {
+  padding-bottom: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.faq-answer p {
+  max-width: 65ch;
+}
+
+/* ─── 17. FOOTER ────────────────────────────────────────── */
+.site-footer {
+  background-color: var(--color-void);
+  color: var(--color-fog);
+  padding-block: var(--sp-12);
+}
+
+.site-footer__inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+@media (min-width: 768px) {
+  .site-footer__inner {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-10);
+  }
+}
+
+.site-footer__logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.site-footer__logo svg {
+  width: 130px;
+  height: auto;
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+@media (min-width: 768px) {
+  .site-footer__nav {
+    flex-direction: row;
+    gap: var(--sp-5);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+
+.footer-link {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-slate);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  letter-spacing: 0.02em;
+}
+
+.footer-link:hover {
+  color: var(--color-fog);
+  text-decoration: none;
+}
+
+.site-footer__copy {
+  color: var(--color-slate);
+  margin-top: auto;
+}
+
+@media (min-width: 768px) {
+  .site-footer__copy {
+    text-align: right;
+    flex-shrink: 0;
+  }
+}
+
+.site-footer__copy a {
+  color: var(--color-slate);
+}
+
+.site-footer__copy a:hover {
+  color: var(--color-fog);
+  text-decoration: none;
+}
+
+/* ─── 18. REDUCED MOTION ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}

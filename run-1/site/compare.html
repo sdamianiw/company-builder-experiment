@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare — BatchCOGS vs. Stocksmith, Inventora, Ardent Seller, FormulaLedger, Katana</title>
+  <meta name="description" content="Full sourced comparison of BatchCOGS against Stocksmith, Inventora, Ardent Seller, FormulaLedger, Katana, and spreadsheets. Every claim links to its source.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ── Compare page local overrides ── */
+
+    .compare-hero {
+      padding-block-start: var(--sp-16);
+      padding-block-end: var(--sp-10);
+      border-bottom: 1px solid var(--color-paper);
+    }
+
+    .compare-hero .container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      max-width: 760px;
+    }
+
+    /* Main comparison table — wide, needs scroll container */
+    .compare-main-section .container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-6);
+    }
+
+    .compare-main-section .t-h2 {
+      max-width: 560px;
+    }
+
+    /* Full-width table wrapper note */
+    .table-scroll-note {
+      font-size: 0.75rem;
+      color: var(--color-slate);
+      margin-bottom: calc(-1 * var(--sp-2));
+    }
+
+    @media (min-width: 900px) {
+      .table-scroll-note { display: none; }
+    }
+
+    /* Per-competitor detail sections */
+    .competitor-detail-section .container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-10);
+    }
+
+    .competitor-block {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      padding-bottom: var(--sp-8);
+      border-bottom: 1px solid var(--color-paper);
+    }
+
+    .competitor-block:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .competitor-block__header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+
+    @media (min-width: 640px) {
+      .competitor-block__header {
+        flex-direction: row;
+        align-items: baseline;
+        gap: var(--sp-4);
+      }
+    }
+
+    .competitor-block__price {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-slate);
+      white-space: nowrap;
+    }
+
+    /* Verdict badges */
+    .verdict {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 2px;
+    }
+
+    .verdict--caution {
+      background-color: #FEF3DC;
+      color: #7A4A00;
+      border: 1px solid #D4911F;
+    }
+
+    .verdict--issue {
+      background-color: #FAE9E8;
+      color: var(--color-error);
+      border: 1px solid var(--color-error);
+    }
+
+    .verdict--limited {
+      background-color: var(--color-paper);
+      color: var(--color-slate);
+      border: 1px solid var(--color-slate);
+    }
+
+    .verdict--out-of-range {
+      background-color: var(--color-paper);
+      color: var(--color-slate);
+      border: 1px solid var(--color-slate);
+    }
+
+    /* Detail list in competitor blocks */
+    .detail-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+
+    .detail-list__row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--sp-1);
+    }
+
+    @media (min-width: 640px) {
+      .detail-list__row {
+        grid-template-columns: 200px 1fr;
+        gap: var(--sp-4);
+      }
+    }
+
+    .detail-list__label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      letter-spacing: 0.04em;
+    }
+
+    .detail-list__value {
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: var(--color-ink);
+    }
+
+    /* Two-col competitor summary grid */
+    .competitor-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--sp-4);
+    }
+
+    @media (min-width: 640px) {
+      .competitor-summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .summary-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      padding: var(--sp-5);
+      background-color: var(--color-paper);
+      border-radius: 2px;
+    }
+
+    .summary-card__label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      letter-spacing: 0.06em;
+    }
+
+    .summary-card p {
+      font-size: 0.875rem;
+      line-height: 1.55;
+    }
+
+    /* Where they're better callout */
+    .better-note {
+      border-left: 2px solid var(--color-slate);
+      padding-left: var(--sp-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+
+    .better-note__label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      letter-spacing: 0.08em;
+    }
+
+    .better-note p {
+      font-size: 0.875rem;
+      line-height: 1.55;
+    }
+
+    /* Inline mono for prices in prose */
+    .inline-mono {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* td-note */
+    .td-note {
+      color: var(--color-slate);
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Footnotes */
+    .footnote-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      max-width: 720px;
+    }
+
+    .footnote-list li {
+      font-size: 0.75rem;
+      color: var(--color-slate);
+      line-height: 1.55;
+      padding-left: var(--sp-4);
+      position: relative;
+    }
+
+    .footnote-list li::before {
+      content: attr(data-fn);
+      position: absolute;
+      left: 0;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════════════════ -->
+<header class="site-header" id="site-header">
+  <div class="site-header__inner">
+
+    <a href="index.html" class="site-header__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#1C3D52" opacity="0.30"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#1C3D52"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#F0F3F5" opacity="0.60"/>
+        <text y="30" font-family="'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#1C3D52">Batch</tspan><tspan font-weight="300" fill="#1C3D52" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <ul class="nav-list" id="nav-list">
+        <li><a href="demo.html"    class="nav-link">Try the demo</a></li>
+        <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+        <li><a href="compare.html" class="nav-link is-current">Compare</a></li>
+        <li><a href="switch.html"  class="nav-link">Switch from Stocksmith</a></li>
+      </ul>
+    </nav>
+
+    <a href="demo.html" class="btn btn--outline nav-cta">Try the demo</a>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-list">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════ -->
+<section class="section compare-hero">
+  <div class="container">
+    <span class="section-label">Full comparison</span>
+    <h1 class="t-h1">Every tool in this category, with every source.</h1>
+    <p class="t-body-lg">
+      Six tools, including spreadsheets. Every claim in this table has a source URL.
+      Where competitors are better than BatchCOGS &mdash; on price, features, or review record &mdash;
+      that is stated plainly.
+    </p>
+    <p class="t-body text-slate">
+      All prices and features reflect publicly available information as of July 2026.
+      Pricing pages change; sources are linked so you can verify current figures.
+    </p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN COMPARISON TABLE
+════════════════════════════════════════════════════════ -->
+<section class="section compare-main-section">
+  <div class="container">
+
+    <span class="section-label">At a glance</span>
+    <h2 class="t-h2">All tools compared on the claims that determine whether you can trust inventory data.</h2>
+
+    <p class="table-scroll-note">Scroll right to see all columns &rarr;</p>
+
+    <div class="table-wrap">
+      <table class="data-table" aria-label="Full tool comparison table with sources">
+        <thead>
+          <tr>
+            <th scope="col">Tool</th>
+            <th scope="col">Price</th>
+            <th scope="col">Etsy</th>
+            <th scope="col">Shopify</th>
+            <th scope="col">Auto-deduct on order?</th>
+            <th scope="col">Independent reviews</th>
+            <th scope="col">Key strength</th>
+            <th scope="col">Key documented issue or limit</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- BatchCOGS — highlighted row -->
+          <tr class="row--highlight">
+            <td><strong>BatchCOGS Pro</strong></td>
+            <td class="td-mono">$19/mo<br><span class="td-note">$180/yr annual</span></td>
+            <td class="td-check">Yes</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check">Yes &mdash; on order receipt</td>
+            <td class="td-cross">None yet &mdash; new product</td>
+            <td>Idempotency-keyed deduction; manual override + audit trail; public status page</td>
+            <td>No independent review record. Labor/overhead not tracked at launch.</td>
+          </tr>
+
+          <!-- Stocksmith -->
+          <tr>
+            <td>
+              Stocksmith Indie
+              <br><a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">[stocksmith.io/pricing]</a>
+            </td>
+            <td class="td-mono">$83&ndash;99/mo<br><span class="td-note">$990/yr annual</span></td>
+            <td class="td-check">Yes</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check">Yes &mdash; confirmed at Indie tier<br><span class="td-note">Pro + Studio tiers not in feature matrix; capability undocumented there</span></td>
+            <td>245 reviews, 4.6/5 on Capterra<br><a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">[capterra.com]</a></td>
+            <td>Established product; largest review record in segment; multi-user accounts; equipment depreciation tracking</td>
+            <td>5&times; price increase from legacy ~$19/mo, documented by named users. Indie is the minimum plan with confirmed auto-deduction.</td>
+          </tr>
+
+          <!-- Inventora -->
+          <tr>
+            <td>
+              Inventora
+              <br><a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">[apps.shopify.com/inventora]</a>
+              <br><a href="https://inventora.com/pricing-plans/" class="source-link" target="_blank" rel="noopener">[inventora.com/pricing-plans]</a>
+            </td>
+            <td class="td-mono">$23/mo (App Store)<br><span class="td-note">$19/mo on own site (annual)<br>Free Hobby: 10 orders/mo</span></td>
+            <td class="td-check">Yes</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check">Yes &mdash; on order receipt</td>
+            <td>8 reviews, 3.9/5 on Shopify App Store<br><a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">[apps.shopify.com/inventora]</a></td>
+            <td>Both channels; free Hobby tier (10 orders/mo); $23/mo month-to-month</td>
+            <td>Overselling during flash sales; inventory duplication on sync; multi-day support non-response. Documented by named App Store reviewers.</td>
+          </tr>
+
+          <!-- Ardent Seller -->
+          <tr>
+            <td>
+              Ardent Seller
+              <br><a href="https://www.ardentseller.app/" class="source-link" target="_blank" rel="noopener">[ardentseller.app]</a>
+            </td>
+            <td class="td-mono">$19/mo<br><span class="td-note">Free tier: 50 transactions/mo, all features</span></td>
+            <td class="td-check">Yes</td>
+            <td class="td-cross">No</td>
+            <td class="td-check">Yes &mdash; Etsy only</td>
+            <td class="td-cross">Zero independent software reviews on any third-party platform</td>
+            <td>$19/mo; free tier with 50 transactions/mo (more generous than BatchCOGS free tier on order count); Etsy-focused</td>
+            <td>No Shopify integration. &ldquo;128 reviews&rdquo; on site are from creator&rsquo;s personal Etsy craft shop (Ardent Workshop), not software users.</td>
+          </tr>
+
+          <!-- FormulaLedger -->
+          <tr>
+            <td>
+              FormulaLedger
+              <br><a href="https://formulaledger.com/pricing" class="source-link" target="_blank" rel="noopener">[formulaledger.com/pricing]</a>
+            </td>
+            <td class="td-mono">$19/mo Starter<br><span class="td-note">$39/mo with FDA MoCRA compliance</span></td>
+            <td class="td-cross">No</td>
+            <td class="td-cross">No</td>
+            <td class="td-cross">Manual batch log only<br><span class="td-note">Deduction fires on user-initiated batch, not on incoming order</span></td>
+            <td class="td-cross">Zero independent reviews. All testimonials vendor-hosted.</td>
+            <td>Working BOM engine; FDA MoCRA compliance features for cosmetics sellers; $19/mo Starter</td>
+            <td>No Etsy or Shopify integration. A flash sale of 50 orders requires manually logging a batch of 50 to trigger any deduction.</td>
+          </tr>
+
+          <!-- Katana -->
+          <tr>
+            <td>
+              Katana
+              <br><span class="td-note">Source: rescue-etsy-cogs.md research sweep</span>
+            </td>
+            <td class="td-mono">$199/mo+</td>
+            <td class="td-check">Partial &mdash; via integrations</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check">Yes</td>
+            <td>Established &mdash; not in target segment</td>
+            <td>Manufacturing-grade features; established product; multi-location inventory</td>
+            <td>Priced for larger manufacturers. $199/mo starting price is 10&times; BatchCOGS Pro. Not a realistic option for handmade sellers at $500&ndash;$10k/mo revenue.</td>
+          </tr>
+
+          <!-- Spreadsheets -->
+          <tr>
+            <td>
+              Spreadsheets (Google Sheets / Excel)
+              <br><a href="https://inventora.com/reviews/" class="source-link" target="_blank" rel="noopener">[inventora.com/reviews &mdash; user quotes]</a>
+            </td>
+            <td class="td-mono">Free</td>
+            <td class="td-cross">No integration</td>
+            <td class="td-cross">No integration</td>
+            <td class="td-cross">No &mdash; manual deduction per batch</td>
+            <td>N/A (not software)</td>
+            <td>Free; fully customizable; no vendor dependency</td>
+            <td>No auto-deduction. Manual upkeep confirmed as the dominant pain: &ldquo;challenges with the upkeep of Excel sheets&rdquo; (Cavelle Wilson, inventora.com/reviews); &ldquo;tracking all of my supplies by sight&rdquo; (Judith Keriopoulos, inventora.com/reviews).</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <p class="t-caption text-slate">
+      Data current as of July 2026. Prices and features change &mdash; every row includes a source link to verify.
+      Stocksmith Pro and Studio tier auto-deduction capability is marked undocumented
+      because those tiers do not appear in the Stocksmith feature comparison matrix
+      (<a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">stocksmith.io/pricing</a>).
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     PER-COMPETITOR DETAIL BLOCKS
+════════════════════════════════════════════════════════ -->
+<section class="section section--paper competitor-detail-section">
+  <div class="container">
+
+    <span class="section-label">Detailed notes by competitor</span>
+    <h2 class="t-h2">Each tool, stated honestly &mdash; including where they are better.</h2>
+
+
+    <!-- ── Stocksmith ── -->
+    <div class="competitor-block" id="stocksmith">
+
+      <div class="competitor-block__header">
+        <h3 class="t-h3">Stocksmith (formerly Craftybase)</h3>
+        <span class="competitor-block__price">Indie: $83&ndash;99/mo &mdash; $990/yr annual</span>
+        <span class="verdict verdict--caution">Price concern</span>
+      </div>
+
+      <div class="detail-list">
+        <div class="detail-list__row">
+          <span class="detail-list__label">Source</span>
+          <span class="detail-list__value">
+            <a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">stocksmith.io/pricing</a>,
+            <a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">capterra.com (245 reviews)</a>
+          </span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Etsy + Shopify</span>
+          <span class="detail-list__value">Yes, at the Indie tier. Pro ($20/mo) and Studio ($41&ndash;49/mo) tiers are not included in the feature comparison matrix on the pricing page; auto-deduction capability at those tiers is undocumented there.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Review record</span>
+          <span class="detail-list__value">245 reviews at 4.6/5 on Capterra as of July 2026 (<a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">capterra.com</a>). This is the largest independent review record in this product category by a significant margin.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Price history</span>
+          <span class="detail-list__value">Legacy Craftybase plan with auto-deduction was approximately $19&ndash;20/month. The move to Stocksmith Indie at $83&ndash;99/month is documented as a roughly 5&times; increase by named reviewers on Capterra: &ldquo;I felt like legacy clients had quite a shock when the price went up x5 (literally my price went up that much without exaggeration)&rdquo; &mdash; Raven T., <a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">August 8, 2024</a>.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Free trial</span>
+          <span class="detail-list__value">14 days (<a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">stocksmith.io/pricing</a>). Time-limited trials make it difficult to evaluate whether inventory data is accurate across a real production run.</span>
+        </div>
+      </div>
+
+      <div class="competitor-summary-grid">
+        <div class="better-note">
+          <span class="better-note__label">Where Stocksmith is better than BatchCOGS</span>
+          <p>245 verified reviews vs. zero for BatchCOGS. Established product with years of real use. Multi-user accounts. Equipment depreciation tracking. Larger feature set at higher tiers. More integration history.</p>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card__label">The single deciding factor</span>
+          <p>If you need auto-deduction on Etsy or Shopify orders, the minimum Stocksmith plan that confirms this feature costs $990/year. BatchCOGS Pro Annual is $180/year for the same feature. The $810/year difference is the only claim BatchCOGS makes against Stocksmith that is grounded solely in verified prices.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ── Inventora ── -->
+    <div class="competitor-block" id="inventora">
+
+      <div class="competitor-block__header">
+        <h3 class="t-h3">Inventora</h3>
+        <span class="competitor-block__price">$23/mo on Shopify App Store &mdash; $19/mo on own site (annual)</span>
+        <span class="verdict verdict--issue">Documented reliability issues</span>
+      </div>
+
+      <div class="detail-list">
+        <div class="detail-list__row">
+          <span class="detail-list__label">Sources</span>
+          <span class="detail-list__value">
+            <a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">apps.shopify.com/inventora</a> (8 reviews, 3.9/5),
+            <a href="https://inventora.com/pricing-plans/" class="source-link" target="_blank" rel="noopener">inventora.com/pricing-plans</a>,
+            <a href="https://inventora.com/reviews/" class="source-link" target="_blank" rel="noopener">inventora.com/reviews</a>
+          </span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Pricing inconsistency</span>
+          <span class="detail-list__value">$23/month on the Shopify App Store (<a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">apps.shopify.com/inventora</a>); $19/month annually on their own site (<a href="https://inventora.com/pricing-plans/" class="source-link" target="_blank" rel="noopener">inventora.com/pricing-plans</a>). The App Store is the primary discovery channel for Shopify sellers; the $23/month figure is what most buyers see first.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Documented issues</span>
+          <span class="detail-list__value">
+            Three categories of problems named by independent App Store reviewers:<br>
+            1. Overselling during flash sales (&ldquo;Attaching it to Shopify meant that I oversell my products during flash sales drops&rdquo;)<br>
+            2. Inventory duplication on sync (&ldquo;no clear-cut way to sync between Inventora and Shopify without TONS of duplicating work&rdquo;)<br>
+            3. Multi-day support non-response (&ldquo;it&rsquo;s days before I get a response&rdquo;)<br>
+            Source: <a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">Shopify App Store reviews</a>
+          </span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Free tier</span>
+          <span class="detail-list__value">Hobby tier: free, 10 orders/month (<a href="https://inventora.com/pricing-plans/" class="source-link" target="_blank" rel="noopener">inventora.com/pricing-plans</a>). BatchCOGS free tier allows 30 orders/month.</span>
+        </div>
+      </div>
+
+      <div class="competitor-summary-grid">
+        <div class="better-note">
+          <span class="better-note__label">Where Inventora is better than BatchCOGS</span>
+          <p>8 independent reviews (vs. zero for BatchCOGS). Both channels at a lower monthly price than Stocksmith. An established product. Inventora&rsquo;s bugs may be fixable; BatchCOGS&rsquo;s reliability is unproven in production.</p>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card__label">The core issue</span>
+          <p>Overselling during a flash sale is a direct business loss. If your Shopify inventory count says you have 50 units and Inventora mis-syncs, you take orders you cannot fill. The 3.9/5 rating on 8 reviews is not a small sample statistical artifact &mdash; it is three distinct categories of failure named by real users.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ── Ardent Seller ── -->
+    <div class="competitor-block" id="ardent-seller">
+
+      <div class="competitor-block__header">
+        <h3 class="t-h3">Ardent Seller</h3>
+        <span class="competitor-block__price">$19/mo &mdash; free tier: 50 transactions/month</span>
+        <span class="verdict verdict--limited">Channel limited</span>
+      </div>
+
+      <div class="detail-list">
+        <div class="detail-list__row">
+          <span class="detail-list__label">Source</span>
+          <span class="detail-list__value">
+            <a href="https://www.ardentseller.app/" class="source-link" target="_blank" rel="noopener">ardentseller.app</a>
+          </span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Channels</span>
+          <span class="detail-list__value">Etsy only. No Shopify integration. If you sell on both platforms, Ardent Seller cannot track your full material usage.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Free tier</span>
+          <span class="detail-list__value">50 transactions/month with all features. This is more generous than BatchCOGS free tier (30 orders/month). If you sell only on Etsy and your volume is under 50 orders/month, Ardent Seller&rsquo;s free tier covers you completely.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Review record</span>
+          <span class="detail-list__value">Zero independent software reviews on any third-party platform &mdash; no Capterra, no G2, no Shopify App Store listing. The &ldquo;128 reviews&rdquo; figure cited on the Ardent Seller website refers to the creator&rsquo;s personal Etsy craft shop (Ardent Workshop), not to software users. There is no independent evidence of reliability or problems.</span>
+        </div>
+      </div>
+
+      <div class="competitor-summary-grid">
+        <div class="better-note">
+          <span class="better-note__label">Where Ardent Seller is better than BatchCOGS</span>
+          <p>More generous free tier (50 transactions/month vs. 30). Same $19/month paid price. Etsy-focused product may have deeper Etsy-specific features. If you sell only on Etsy and want the free tier, Ardent Seller&rsquo;s offer is stronger than BatchCOGS&rsquo;s.</p>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card__label">The deciding question</span>
+          <p>Do you sell on Shopify? If yes, Ardent Seller cannot help you. If you sell only on Etsy and are comfortable with a product that has no independent review record, it is a real option at the same price. BatchCOGS and Ardent Seller are both new and unreviewed &mdash; the difference is channel coverage.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ── FormulaLedger ── -->
+    <div class="competitor-block" id="formulaledger">
+
+      <div class="competitor-block__header">
+        <h3 class="t-h3">FormulaLedger</h3>
+        <span class="competitor-block__price">$19/mo Starter &mdash; $39/mo with FDA compliance</span>
+        <span class="verdict verdict--limited">No channel integration</span>
+      </div>
+
+      <div class="detail-list">
+        <div class="detail-list__row">
+          <span class="detail-list__label">Source</span>
+          <span class="detail-list__value">
+            <a href="https://formulaledger.com/pricing" class="source-link" target="_blank" rel="noopener">formulaledger.com/pricing</a>
+          </span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">How deduction works</span>
+          <span class="detail-list__value">You log a production batch manually; stock auto-deducts from that manual entry. The homepage states &ldquo;Log a batch and stock auto-deducts&rdquo; &mdash; the batch log is a user action, not an event from Etsy or Shopify. There is no Etsy or Shopify integration; orders do not trigger deduction directly.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">The practical impact</span>
+          <span class="detail-list__value">A flash sale of 50 Etsy orders requires you to manually log a batch of 50 to register any deduction. This is the exact workflow the persona is trying to eliminate. FormulaLedger&rsquo;s BOM engine is genuinely functional; the gap is the missing order-event trigger.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Specialty features</span>
+          <span class="detail-list__value">FDA MoCRA compliance tracking and INCI ingredient listing &mdash; valuable for cosmetics and skincare sellers with regulatory requirements. BatchCOGS does not have these features.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Review record</span>
+          <span class="detail-list__value">Zero independent reviews. All testimonials are vendor-hosted on the FormulaLedger website.</span>
+        </div>
+      </div>
+
+      <div class="competitor-summary-grid">
+        <div class="better-note">
+          <span class="better-note__label">Where FormulaLedger is better than BatchCOGS</span>
+          <p>FDA MoCRA compliance features for cosmetics sellers. INCI ingredient tracking. The BOM engine works. For a candle or soap maker with regulatory compliance requirements, FormulaLedger covers ground BatchCOGS does not. The $39/mo Compliance tier may be worth it specifically for that use case.</p>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card__label">The threat assessment</span>
+          <p>FormulaLedger is the highest-threat future competitor. They have the right price, the right persona, and a working BOM engine. If they add Etsy and Shopify webhook integration, the differentiation gap between FormulaLedger and BatchCOGS narrows sharply. The window is estimated at 6&ndash;12 months before they could close this gap.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ── Katana ── -->
+    <div class="competitor-block" id="katana">
+
+      <div class="competitor-block__header">
+        <h3 class="t-h3">Katana</h3>
+        <span class="competitor-block__price">$199/month and up</span>
+        <span class="verdict verdict--out-of-range">Out of range for this segment</span>
+      </div>
+
+      <div class="detail-list">
+        <div class="detail-list__row">
+          <span class="detail-list__label">Source</span>
+          <span class="detail-list__value">Cited in rescue-etsy-cogs.md research sweep as a product observed during the competitive landscape review, priced above the segment.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Intended buyer</span>
+          <span class="detail-list__value">Manufacturers with larger production operations, multi-location inventory, and more complex BOM requirements than a handmade seller generating $500&ndash;$10,000/month. Not priced for this segment.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">Channels</span>
+          <span class="detail-list__value">Shopify integration. Etsy via third-party integrations &mdash; not a direct native connection in the same way as BatchCOGS or Inventora.</span>
+        </div>
+      </div>
+
+      <div class="better-note">
+        <span class="better-note__label">Where Katana is better than BatchCOGS</span>
+        <p>More advanced manufacturing features, multi-location inventory, established product with a verified user base, more robust reporting. If you have outgrown handmade-seller-scale operations, Katana addresses needs BatchCOGS does not. The $199/month starting price reflects that difference.</p>
+      </div>
+
+    </div>
+
+
+    <!-- ── Spreadsheets ── -->
+    <div class="competitor-block" id="spreadsheets">
+
+      <div class="competitor-block__header">
+        <h3 class="t-h3">Spreadsheets (Google Sheets / Excel)</h3>
+        <span class="competitor-block__price">Free</span>
+        <span class="verdict verdict--limited">No automation</span>
+      </div>
+
+      <div class="detail-list">
+        <div class="detail-list__row">
+          <span class="detail-list__label">Source</span>
+          <span class="detail-list__value">
+            User quotes from <a href="https://inventora.com/reviews/" class="source-link" target="_blank" rel="noopener">inventora.com/reviews</a>.
+            Named sellers describe this as their pre-software state.
+          </span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">What they cannot do</span>
+          <span class="detail-list__value">A spreadsheet cannot receive a webhook from Etsy or Shopify and auto-deduct materials. Every order requires a manual entry. Auto-deduction on order receipt is structurally impossible without an integration.</span>
+        </div>
+        <div class="detail-list__row">
+          <span class="detail-list__label">User-documented pain</span>
+          <span class="detail-list__value">
+            &ldquo;challenges with the upkeep of Excel sheets&rdquo; &mdash; Cavelle Wilson
+            (<a href="https://inventora.com/reviews/" class="source-link" target="_blank" rel="noopener">inventora.com/reviews</a>)<br>
+            &ldquo;tracking all of my supplies by sight&rdquo; &mdash; Judith Keriopoulos
+            (<a href="https://inventora.com/reviews/" class="source-link" target="_blank" rel="noopener">inventora.com/reviews</a>)
+          </span>
+        </div>
+      </div>
+
+      <div class="competitor-summary-grid">
+        <div class="better-note">
+          <span class="better-note__label">Where spreadsheets are better than BatchCOGS</span>
+          <p>Free. No vendor dependency &mdash; your data is never locked in a third-party system. Fully customizable. For a seller with 5 SKUs and 10 orders a month, a spreadsheet may be sufficient. BatchCOGS asks you to pay $19/month or trust a free-tier new product. A spreadsheet asks nothing.</p>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card__label">When to switch</span>
+          <p>The BatchCOGS free tier is designed to replace a spreadsheet directly: 20 materials, 20 products, 30 orders/month, no credit card. The case for switching is time saved on manual entries and the elimination of the risk of a missed deduction during a high-volume day.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     HONEST POSITIONING SUMMARY
+════════════════════════════════════════════════════════ -->
+<section class="section section--dark">
+  <div class="container">
+
+    <span class="section-label">What this comparison shows</span>
+    <h2 class="t-h2" style="max-width: 600px;">BatchCOGS is not better on every dimension. Here is what it does and does not offer.</h2>
+
+    <div class="grid-2" style="gap: var(--sp-8); margin-top: var(--sp-6);">
+
+      <div style="display: flex; flex-direction: column; gap: var(--sp-4);">
+        <h3 class="t-h3" style="color: var(--color-fog);">Where BatchCOGS has an advantage</h3>
+        <ul style="display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; padding: 0;">
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-amber);">&#8250;</span>
+            Price vs. Stocksmith: $180/year vs. $990/year for the same auto-deduction feature, per verified pricing at <a href="https://stocksmith.io/pricing" style="color: var(--color-slate);" target="_blank" rel="noopener">stocksmith.io/pricing</a>.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-amber);">&#8250;</span>
+            Both channels vs. Ardent Seller: Etsy + Shopify vs. Etsy only.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-amber);">&#8250;</span>
+            Order-triggered deduction vs. FormulaLedger: auto on order receipt vs. manual batch log.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-amber);">&#8250;</span>
+            Free tier order cap vs. Inventora: 30 orders/month free vs. 10 orders/month free.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-amber);">&#8250;</span>
+            Idempotency-keyed webhooks: every order deduction is logged with a key that prevents the same order from deducting materials twice, even if the webhook fires more than once.
+          </li>
+        </ul>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: var(--sp-4);">
+        <h3 class="t-h3" style="color: var(--color-fog);">Where BatchCOGS does not have an advantage</h3>
+        <ul style="display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; padding: 0;">
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-slate);">&ndash;</span>
+            No independent reviews. Stocksmith has 245 Capterra reviews. BatchCOGS has zero. A new product asking you to trust it with core business data has not yet earned that trust.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-slate);">&ndash;</span>
+            Free tier order count vs. Ardent Seller: 30 orders/month vs. 50 transactions/month. Ardent Seller&rsquo;s free tier is more generous if you sell only on Etsy.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-slate);">&ndash;</span>
+            No FDA MoCRA compliance features. FormulaLedger has them. If you make cosmetics subject to FDA registration, FormulaLedger&rsquo;s $39/month Compliance tier addresses a need BatchCOGS does not.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-slate);">&ndash;</span>
+            No labor or overhead tracking at launch. Stocksmith tracks more COGS components. BatchCOGS tracks material cost only.
+          </li>
+          <li class="t-body-sm" style="color: var(--color-fog); padding-left: var(--sp-4); position: relative;">
+            <span style="position: absolute; left: 0; color: var(--color-slate);">&ndash;</span>
+            No multi-user accounts at launch. Stocksmith supports them. BatchCOGS does not.
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     CTA
+════════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div style="display: flex; flex-direction: column; gap: var(--sp-4); max-width: 600px;">
+      <span class="section-label">Next steps</span>
+      <h2 class="t-h2">Verify it yourself before paying anything.</h2>
+      <p class="t-body">
+        The free tier has no credit card requirement and no time limit.
+        Connect your Etsy or Shopify shop, run some orders through, and check
+        whether the material deductions match what you expect.
+        That is the only way to know whether any inventory tool works for your specific setup.
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center;">
+        <a href="demo.html" class="btn btn--primary">Try the demo</a>
+        <a href="pricing.html" class="btn btn--ghost">See pricing</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     SOURCE FOOTNOTES
+════════════════════════════════════════════════════════ -->
+<section class="section section--paper">
+  <div class="container">
+
+    <span class="section-label">All sources</span>
+    <h2 class="t-h2">Every claim on this page, with its source.</h2>
+
+    <ol class="footnote-list">
+      <li data-fn="1.">
+        Stocksmith pricing (Indie, Pro, Studio, Business, Growth tiers):
+        <a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">stocksmith.io/pricing</a>
+      </li>
+      <li data-fn="2.">
+        Stocksmith/Craftybase Capterra reviews (245 reviews, 4.6/5 as of July 2026):
+        <a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">capterra.com/p/144117/Craftybase/reviews/</a>
+      </li>
+      <li data-fn="3.">
+        Raven T. quote (price increase &ldquo;x5&rdquo;): Capterra review of Craftybase, August 8, 2024.
+        <a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">capterra.com/p/144117/Craftybase/reviews/</a>
+      </li>
+      <li data-fn="4.">
+        Liza K. quote (&ldquo;$1,000 / year&rdquo;): Capterra review of Craftybase, September 19, 2025.
+        <a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">capterra.com/p/144117/Craftybase/reviews/</a>
+      </li>
+      <li data-fn="5.">
+        Anonymous quote (materials not auto-deducted without expensive plan): SoftwareAdvice review of Craftybase.
+        <a href="https://www.softwareadvice.com/inventory-management/craftybase-profile/reviews/" class="source-link" target="_blank" rel="noopener">softwareadvice.com/inventory-management/craftybase-profile/reviews/</a>
+      </li>
+      <li data-fn="6.">
+        Inventora Shopify App Store listing (8 reviews, 3.9/5; $23/mo):
+        <a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">apps.shopify.com/inventora/reviews</a>
+      </li>
+      <li data-fn="7.">
+        Inventora pricing page ($19/mo annually; Hobby free tier at 10 orders/mo):
+        <a href="https://inventora.com/pricing-plans/" class="source-link" target="_blank" rel="noopener">inventora.com/pricing-plans/</a>
+      </li>
+      <li data-fn="8.">
+        Inventora user reviews (Cavelle Wilson, Judith Keriopoulos quotes on spreadsheet pain):
+        <a href="https://inventora.com/reviews/" class="source-link" target="_blank" rel="noopener">inventora.com/reviews/</a>
+      </li>
+      <li data-fn="9.">
+        Ardent Seller pricing and channel coverage (Etsy only, no Shopify):
+        <a href="https://www.ardentseller.app/" class="source-link" target="_blank" rel="noopener">ardentseller.app</a>
+      </li>
+      <li data-fn="10.">
+        FormulaLedger pricing (Starter $19/mo, Compliance $39/mo):
+        <a href="https://formulaledger.com/pricing" class="source-link" target="_blank" rel="noopener">formulaledger.com/pricing</a>
+      </li>
+      <li data-fn="11.">
+        Katana: cited in rescue-etsy-cogs.md research sweep as out-of-range for this segment.
+        No direct source URL available for specific pricing; verify current pricing at katanamrp.com.
+      </li>
+    </ol>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+
+    <a href="index.html" class="site-footer__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#F0F3F5" opacity="0.30"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#F0F3F5"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.55"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.55"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#1C3D52" opacity="0.35"/>
+        <text y="30" font-family="'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#F0F3F5">Batch</tspan><tspan font-weight="300" fill="#F0F3F5" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+
+    <nav aria-label="Footer navigation" class="site-footer__nav">
+      <a href="demo.html"    class="footer-link">Try the demo</a>
+      <a href="pricing.html" class="footer-link">Pricing</a>
+      <a href="compare.html" class="footer-link">Compare</a>
+      <a href="switch.html"  class="footer-link">Switch from Stocksmith</a>
+    </nav>
+
+    <p class="t-caption site-footer__copy">
+      &copy; 2026 BatchCOGS &middot;
+      <a href="mailto:hello@batchcogs.com" class="footer-link">hello@batchcogs.com</a>
+    </p>
+
+  </div>
+</footer>
+
+
+<!-- Mobile navigation toggle -->
+<script>
+  (function () {
+    var header  = document.getElementById('site-header');
+    var toggle  = document.getElementById('nav-toggle');
+
+    if (!header || !toggle) return;
+
+    toggle.addEventListener('click', function () {
+      var isOpen = header.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      toggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && header.classList.contains('nav-open')) {
+        header.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+        toggle.focus();
+      }
+    });
+
+    var navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function () {
+        header.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+      });
+    });
+  }());
+</script>
+
+</body>
+</html>

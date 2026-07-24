@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing — BatchCOGS</title>
+  <meta name="description" content="BatchCOGS pricing: Free tier (no credit card, no time limit), Pro at $19/month, Pro Annual at $180/year. Compared to Stocksmith Indie at $990/year.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ── Pricing page local overrides ── */
+
+    /* Annual savings callout strip */
+    .annual-callout {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-4);
+      padding: var(--sp-5) var(--sp-6);
+      border-left: 2px solid var(--color-amber);
+      background-color: var(--color-paper);
+      border-radius: 0 2px 2px 0;
+      max-width: 680px;
+    }
+
+    .annual-callout__stat {
+      flex-shrink: 0;
+    }
+
+    .annual-callout__stat strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-ink);
+      line-height: 1;
+    }
+
+    .annual-callout__stat span {
+      font-size: 0.75rem;
+      color: var(--color-slate);
+      display: block;
+      margin-top: 4px;
+    }
+
+    .annual-callout__text {
+      color: var(--color-ink);
+    }
+
+    /* Feature tier table */
+    .tier-table th:not(:first-child),
+    .tier-table td:not(:first-child) {
+      text-align: center;
+    }
+
+    .tier-table th.col-featured {
+      color: var(--color-ink);
+      font-weight: 600;
+    }
+
+    .tier-table td.col-featured {
+      background-color: var(--color-paper);
+    }
+
+    .tier-table th {
+      vertical-align: bottom;
+      padding-bottom: var(--sp-4);
+    }
+
+    /* Pricing hero */
+    .pricing-hero {
+      padding-block-start: var(--sp-16);
+      padding-block-end: var(--sp-10);
+      border-bottom: 1px solid var(--color-paper);
+    }
+
+    .pricing-hero .container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      max-width: 760px;
+    }
+
+    /* Cancel + credit-card note */
+    .billing-note {
+      max-width: 56ch;
+      color: var(--color-slate);
+    }
+
+    /* inline price in prose */
+    .inline-mono {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* td-note */
+    .td-note {
+      color: var(--color-slate);
+      font-size: 0.75rem;
+    }
+
+    /* FAQ answer source links */
+    .faq-answer .source-link {
+      font-size: 0.875rem;
+    }
+
+    /* Pricing section spacing override */
+    .pricing-page-section .container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-8);
+    }
+
+    /* Three-column grid for pricing cards on this page */
+    .pricing-page-section .pricing-grid {
+      align-items: stretch;
+    }
+
+    .pricing-page-section .pricing-card {
+      height: 100%;
+    }
+
+    /* Badge on featured card */
+    .pricing-badge {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--color-amber);
+      border: 1px solid var(--color-amber);
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-bottom: var(--sp-2);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════════════════ -->
+<header class="site-header" id="site-header">
+  <div class="site-header__inner">
+
+    <a href="index.html" class="site-header__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#1C3D52" opacity="0.30"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#1C3D52"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#F0F3F5" opacity="0.60"/>
+        <text y="30" font-family="'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#1C3D52">Batch</tspan><tspan font-weight="300" fill="#1C3D52" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <ul class="nav-list" id="nav-list">
+        <li><a href="demo.html"    class="nav-link">Try the demo</a></li>
+        <li><a href="pricing.html" class="nav-link is-current">Pricing</a></li>
+        <li><a href="compare.html" class="nav-link">Compare</a></li>
+        <li><a href="switch.html"  class="nav-link">Switch from Stocksmith</a></li>
+      </ul>
+    </nav>
+
+    <a href="demo.html" class="btn btn--outline nav-cta">Try the demo</a>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-list">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════ -->
+<section class="section pricing-hero">
+  <div class="container">
+    <span class="section-label">Pricing</span>
+    <h1 class="t-h1">$19/month. Or $180/year. Compared to $990/year.</h1>
+    <p class="t-body-lg">
+      Stocksmith Indie &mdash; the only Stocksmith tier with confirmed auto-deduction &mdash;
+      costs $990/year billed annually
+      (<a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">stocksmith.io/pricing</a>).
+      BatchCOGS Pro does the same thing for $180/year. The free tier requires no credit card and has no time limit.
+    </p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     PRICING CARDS
+════════════════════════════════════════════════════════ -->
+<section class="section pricing-page-section">
+  <div class="container">
+
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="card pricing-card">
+        <p class="t-label pricing-card__tier">Free</p>
+        <p class="pricing-card__price t-mono-lg">$0</p>
+        <p class="t-body-sm pricing-card__period">No time limit &mdash; no credit card</p>
+        <ul class="feature-list t-body-sm">
+          <li>20 materials</li>
+          <li>20 products</li>
+          <li>1 channel (Etsy or Shopify, not both)</li>
+          <li>30 orders/month</li>
+          <li>COGS per unit (material cost only)</li>
+          <li>Idempotency-keyed webhook logging</li>
+          <li>Manual override + audit trail</li>
+        </ul>
+        <a href="demo.html" class="btn btn--ghost btn--full">Try the demo</a>
+      </div>
+
+      <!-- Pro — featured -->
+      <div class="card card--ink pricing-card">
+        <span class="pricing-badge">Most common</span>
+        <p class="t-label pricing-card__tier">Pro</p>
+        <div class="pricing-card__price">
+          <span style="font-family: var(--font-mono); font-size: 2rem; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--color-fog);">$19</span><span class="pricing-card__unit">/month</span>
+        </div>
+        <p class="t-body-sm pricing-card__period">Billed monthly &mdash; cancel at any time</p>
+        <ul class="feature-list t-body-sm">
+          <li>Unlimited materials</li>
+          <li>Unlimited products</li>
+          <li>Both channels: Etsy + Shopify</li>
+          <li>Unlimited orders</li>
+          <li>COGS reports</li>
+          <li>Margin view per SKU</li>
+          <li>CSV export (all transactions + inventory)</li>
+          <li>Low-stock email alerts</li>
+          <li>Email support, &lt;24hr response</li>
+          <li>Public status page</li>
+        </ul>
+        <a href="demo.html" class="btn btn--outline btn--full">Try the demo</a>
+      </div>
+
+      <!-- Pro Annual -->
+      <div class="card pricing-card">
+        <p class="t-label pricing-card__tier">Pro Annual</p>
+        <p class="pricing-card__price t-mono-lg">$15<span class="pricing-card__unit">/month</span></p>
+        <p class="t-body-sm pricing-card__period">$180 billed once per year</p>
+        <ul class="feature-list t-body-sm">
+          <li>Everything in Pro</li>
+          <li>$48/year less than monthly Pro ($228&nbsp;vs.&nbsp;$180)</li>
+          <li>$810/year less than Stocksmith Indie annual</li>
+          <li>Below legacy Craftybase price (~$228/year)</li>
+        </ul>
+        <a href="demo.html" class="btn btn--ghost btn--full">Try the demo</a>
+      </div>
+
+    </div>
+
+    <!-- Annual savings callout -->
+    <div class="annual-callout" role="note" aria-label="Annual savings comparison">
+      <div class="annual-callout__stat">
+        <strong>$810</strong>
+        <span>per year saved</span>
+      </div>
+      <p class="t-body annual-callout__text">
+        Stocksmith Indie annual: <span class="inline-mono">$990/year</span>
+        (<a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">verified at stocksmith.io/pricing</a>).
+        BatchCOGS Pro Annual: <span class="inline-mono">$180/year</span>.
+        Same core feature: materials auto-deducted the moment an Etsy or Shopify order lands.
+      </p>
+    </div>
+
+    <p class="t-caption billing-note">
+      BatchCOGS Pro is $19/month on every channel &mdash; including the Shopify App Store. No App Store markup.
+      Inventora charges $23/month on the Shopify App Store
+      (<a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">apps.shopify.com/inventora</a>)
+      while listing $19/month on their own website.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FEATURE TIER TABLE
+════════════════════════════════════════════════════════ -->
+<section class="section section--paper">
+  <div class="container">
+
+    <span class="section-label">What each tier includes</span>
+    <h2 class="t-h2">Feature breakdown by plan.</h2>
+
+    <div class="table-wrap">
+      <table class="data-table tier-table" aria-label="Feature comparison by plan tier">
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            <th scope="col">Free</th>
+            <th scope="col" class="col-featured">Pro &mdash; $19/mo</th>
+            <th scope="col">Pro Annual &mdash; $15/mo</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>Materials</td>
+            <td class="td-mono">20</td>
+            <td class="td-mono col-featured">Unlimited</td>
+            <td class="td-mono">Unlimited</td>
+          </tr>
+
+          <tr>
+            <td>Products / SKUs</td>
+            <td class="td-mono">20</td>
+            <td class="td-mono col-featured">Unlimited</td>
+            <td class="td-mono">Unlimited</td>
+          </tr>
+
+          <tr>
+            <td>Sales channels</td>
+            <td>1 channel &mdash; Etsy or Shopify</td>
+            <td class="col-featured">Etsy + Shopify</td>
+            <td>Etsy + Shopify</td>
+          </tr>
+
+          <tr>
+            <td>Orders per month</td>
+            <td class="td-mono">30</td>
+            <td class="td-mono col-featured">Unlimited</td>
+            <td class="td-mono">Unlimited</td>
+          </tr>
+
+          <tr>
+            <td>Auto-deduct on order receipt</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>Idempotency keys (no double-deductions)</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>Manual override + audit trail</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>COGS per unit (material cost)</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>Margin view (COGS vs. sale price per SKU)</td>
+            <td class="td-cross">&mdash;</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>CSV export (transactions + inventory)</td>
+            <td class="td-cross">&mdash;</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>Low-stock email alerts</td>
+            <td class="td-cross">&mdash;</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>Email support</td>
+            <td class="td-cross">&mdash;</td>
+            <td class="col-featured">&lt;24hr response</td>
+            <td>&lt;24hr response</td>
+          </tr>
+
+          <tr>
+            <td>Public status page</td>
+            <td class="td-check">Yes</td>
+            <td class="td-check col-featured">Yes</td>
+            <td class="td-check">Yes</td>
+          </tr>
+
+          <tr>
+            <td>Credit card required</td>
+            <td class="td-cross">No</td>
+            <td class="col-featured">Yes &mdash; to start billing</td>
+            <td>Yes &mdash; to start billing</td>
+          </tr>
+
+          <tr>
+            <td>Time limit</td>
+            <td class="td-cross">None</td>
+            <td class="col-featured">None &mdash; monthly billing</td>
+            <td>Annual billing period</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <p class="t-caption text-slate">
+      Labor and overhead costs are not auto-calculated at launch &mdash; material cost only.
+      You can add a manual overhead line in the COGS view.
+      See the FAQ below for the full scope of what is and is not included.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     STOCKSMITH ANCHOR
+════════════════════════════════════════════════════════ -->
+<section class="section section--dark">
+  <div class="container">
+
+    <span class="section-label">The verified comparison</span>
+    <h2 class="t-h2">Stocksmith Indie: $990/year. BatchCOGS Pro Annual: $180/year.</h2>
+
+    <p class="t-body-lg" style="max-width: 64ch; opacity: 0.9;">
+      Stocksmith (formerly Craftybase) moved auto-material-deduction behind their Indie tier
+      in 2024 &mdash; documented as a roughly 5&times; increase by named users on
+      <a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">Capterra</a>.
+      Indie is $83/month billed annually, or $99/month month-to-month.
+      That is $990/year at the annual rate.
+    </p>
+
+    <blockquote style="max-width: 60ch; border-left: 2px solid var(--color-amber); padding-left: var(--sp-4);">
+      <p class="t-body" style="font-style: italic; color: var(--color-fog);">
+        &ldquo;Having materials automatically deduct when I sell a product is very basic functionality
+        that I should not have to pay $1,000 / year to have.&rdquo;
+      </p>
+      <cite style="display: block; margin-top: var(--sp-3); font-size: 0.75rem; font-style: normal; color: var(--color-slate);">
+        Liza K. &mdash;
+        <a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">
+          Capterra review of Craftybase, September 19, 2025
+        </a>
+      </cite>
+    </blockquote>
+
+    <p class="t-body-sm" style="color: var(--color-slate); max-width: 60ch;">
+      Stocksmith Pro ($20/mo) and Studio ($41&ndash;49/mo) tiers are not included in the feature comparison
+      matrix on their pricing page
+      (<a href="https://stocksmith.io/pricing" class="source-link" target="_blank" rel="noopener">stocksmith.io/pricing</a>);
+      auto-deduction capability at those tiers is undocumented there.
+      Only the Indie tier is confirmed to include it.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FAQ
+════════════════════════════════════════════════════════ -->
+<section class="section faq-section">
+  <div class="container">
+
+    <div class="faq-header">
+      <span class="section-label">Questions about pricing</span>
+      <h2 class="t-h2">Honest answers.</h2>
+    </div>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">Do I need a credit card to start?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            No. The free tier requires no credit card and has no time limit.
+            You enter a card only when you upgrade to Pro or Pro Annual.
+          </p>
+          <p>
+            The free tier has hard limits: 20 materials, 20 products, 1 channel, 30 orders/month.
+            Those limits exist so you can verify that auto-deduction works correctly before paying anything.
+            They are not there to hide the product behind a trial clock.
+          </p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">Can I cancel at any time?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            Monthly plans: yes. Canceling stops billing at the end of your current billing period.
+            You keep Pro access through the date you paid for. No cancellation fee, no required notice period.
+            This is the billing intent, not a guarantee carved out by fine print.
+          </p>
+          <p>
+            Annual plans: canceling stops the automatic renewal. The current year&rsquo;s plan stays
+            active through the paid date. Annual billing is not prorated on cancellation &mdash;
+            the $180 covers the full year you paid for.
+          </p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">What happens when I hit 30 orders on the free tier?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            Orders above the 30/month cap are queued and not automatically deducted.
+            You see them in your sync dashboard; materials are not silently lost or silently doubled.
+            You will receive an email notification when you hit the cap.
+          </p>
+          <p>
+            Upgrading to Pro processes the queued orders.
+            An Etsy seller running more than 30 orders a month is generating real revenue;
+            $19/month to automate material tracking at that volume is less than $0.64 per order.
+          </p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">Is the price the same on the Shopify App Store?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            Yes. $19/month on every channel, including the Shopify App Store.
+          </p>
+          <p>
+            Inventora lists $23/month on the Shopify App Store
+            (<a href="https://apps.shopify.com/inventora/reviews" class="source-link" target="_blank" rel="noopener">apps.shopify.com/inventora</a>)
+            while showing $19/month on their own website
+            (<a href="https://inventora.com/pricing-plans/" class="source-link" target="_blank" rel="noopener">inventora.com/pricing-plans</a>).
+            BatchCOGS charges the same price everywhere.
+          </p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">Does the $180/year annual plan auto-renew?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            Yes. The annual plan renews at $180 each year unless you cancel before the renewal date.
+            You will receive a renewal reminder 14 days before the charge.
+            Canceling before that date stops the next charge and keeps access through the paid year.
+          </p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">Does BatchCOGS track labor or overhead, or only materials?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            Material costs only at launch &mdash; the raw inputs in your recipe.
+            Labor and overhead are not auto-calculated in the current version.
+            You can add a manual overhead line in the COGS view for an approximate fully-loaded cost,
+            but the number is not tracked against orders.
+          </p>
+          <p>
+            This is the honest scope of the current build. Labor and overhead tracking are on the roadmap;
+            they are not in the product today.
+          </p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">How does BatchCOGS compare to Stocksmith Indie beyond price?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            Stocksmith (formerly Craftybase) is an established product with 245 reviews at 4.6/5 on Capterra
+            (<a href="https://www.capterra.com/p/144117/Craftybase/reviews/" class="source-link" target="_blank" rel="noopener">capterra.com</a>).
+            That review record reflects years of real use.
+            BatchCOGS does not have that record yet.
+          </p>
+          <p>
+            What Stocksmith Indie does that BatchCOGS does not: equipment depreciation tracking,
+            multi-user accounts, more advanced reporting at higher tiers.
+            The core feature &mdash; recipe-based auto-deduction on Etsy and Shopify orders &mdash;
+            is present in both. Stocksmith Indie charges $990/year for it.
+            BatchCOGS Pro Annual charges $180/year.
+          </p>
+          <p>
+            <a href="compare.html" class="link-arrow">Full feature and price comparison &rarr;</a>
+          </p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-item__summary">
+          <span class="faq-question">I was paying $19/month on Craftybase. Is this the same thing?</span>
+        </summary>
+        <div class="faq-answer t-body">
+          <p>
+            The core feature is the same: recipe-based material deduction that fires when an order arrives
+            on Etsy or Shopify.
+            Craftybase.com now redirects to Stocksmith with no legacy plans available.
+          </p>
+          <p>
+            BatchCOGS is a newer product and does not yet have Craftybase&rsquo;s review history.
+            The free tier is specifically designed to let you verify that deduction works correctly
+            before committing any payment.
+          </p>
+          <p>
+            <a href="switch.html" class="link-arrow">See the switching guide for data import steps &rarr;</a>
+          </p>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     CTA
+════════════════════════════════════════════════════════ -->
+<section class="section section--paper">
+  <div class="container">
+    <div style="display: flex; flex-direction: column; gap: var(--sp-4); max-width: 600px;">
+      <span class="section-label">Ready to start</span>
+      <h2 class="t-h2">Start with the free tier. No credit card, no countdown.</h2>
+      <p class="t-body">
+        Add your materials, build your first recipe, and connect Etsy or Shopify.
+        Verify that auto-deduction works on your actual orders before you pay anything.
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center;">
+        <a href="demo.html" class="btn btn--primary">Try the demo</a>
+        <a href="compare.html" class="btn btn--ghost">See full comparison</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+
+    <a href="index.html" class="site-footer__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#F0F3F5" opacity="0.30"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#F0F3F5"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.55"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.55"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#1C3D52" opacity="0.35"/>
+        <text y="30" font-family="'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#F0F3F5">Batch</tspan><tspan font-weight="300" fill="#F0F3F5" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+
+    <nav aria-label="Footer navigation" class="site-footer__nav">
+      <a href="demo.html"    class="footer-link">Try the demo</a>
+      <a href="pricing.html" class="footer-link">Pricing</a>
+      <a href="compare.html" class="footer-link">Compare</a>
+      <a href="switch.html"  class="footer-link">Switch from Stocksmith</a>
+    </nav>
+
+    <p class="t-caption site-footer__copy">
+      &copy; 2026 BatchCOGS &middot;
+      <a href="mailto:hello@batchcogs.com" class="footer-link">hello@batchcogs.com</a>
+    </p>
+
+  </div>
+</footer>
+
+
+<!-- Mobile navigation toggle -->
+<script>
+  (function () {
+    var header  = document.getElementById('site-header');
+    var toggle  = document.getElementById('nav-toggle');
+
+    if (!header || !toggle) return;
+
+    toggle.addEventListener('click', function () {
+      var isOpen = header.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      toggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && header.classList.contains('nav-open')) {
+        header.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+        toggle.focus();
+      }
+    });
+
+    var navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function () {
+        header.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+      });
+    });
+  }());
+</script>
+
+</body>
+</html>

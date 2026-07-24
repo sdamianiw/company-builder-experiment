@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COGS quick calculator — BatchCOGS</title>
+  <meta name="description" content="Enter your materials, costs, and batch size to calculate per-unit COGS and suggested retail price at your target margin. No account required.">
+
+  <!-- Google Fonts — only permitted external resource -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ── Calculator page styles ── */
+
+    /* Layout wrapper */
+    .calc-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--sp-6);
+      align-items: start;
+    }
+
+    @media (min-width: 900px) {
+      .calc-layout {
+        grid-template-columns: 1fr 340px;
+        gap: var(--sp-8);
+      }
+    }
+
+    /* Batch info bar */
+    .batch-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-4);
+      align-items: flex-end;
+      padding: var(--sp-4) var(--sp-5);
+      background-color: var(--color-paper);
+      border-radius: 2px;
+      border: 1px solid var(--color-paper);
+      margin-bottom: var(--sp-5);
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .form-label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      letter-spacing: 0.04em;
+    }
+
+    .form-input {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--color-ink);
+      background-color: var(--color-fog);
+      border: 1px solid var(--color-paper);
+      border-radius: 2px;
+      padding: 8px 12px;
+      line-height: 1.4;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-amber);
+    }
+
+    .form-input:focus-visible {
+      outline: 2px solid var(--color-amber);
+      outline-offset: 2px;
+    }
+
+    .form-input--mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Materials table */
+    .materials-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--color-paper);
+      border-radius: 2px;
+    }
+
+    .materials-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+    }
+
+    .materials-table th {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      letter-spacing: 0.06em;
+      text-align: left;
+      padding: var(--sp-3) var(--sp-3);
+      background-color: var(--color-paper);
+      border-bottom: 1px solid var(--color-paper);
+      white-space: nowrap;
+    }
+
+    .materials-table td {
+      padding: var(--sp-2) var(--sp-2);
+      border-bottom: 1px solid var(--color-paper);
+      vertical-align: middle;
+    }
+
+    .materials-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .materials-table .td-input {
+      padding: var(--sp-1) var(--sp-2);
+    }
+
+    .mat-input {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      color: var(--color-ink);
+      background-color: transparent;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      padding: 6px 8px;
+      width: 100%;
+      transition: background-color 0.1s, border-color 0.1s;
+    }
+
+    .mat-input:focus {
+      outline: none;
+      background-color: var(--color-fog);
+      border-color: var(--color-amber);
+    }
+
+    .mat-input--mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mat-input--name {
+      min-width: 120px;
+    }
+
+    .mat-input--num {
+      width: 72px;
+      text-align: right;
+    }
+
+    .mat-input--unit {
+      width: 52px;
+    }
+
+    .mat-input--cost {
+      width: 84px;
+      text-align: right;
+    }
+
+    .mat-total {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-ink);
+      text-align: right;
+      padding: 6px 8px;
+      white-space: nowrap;
+    }
+
+    .mat-total--empty {
+      color: var(--color-slate);
+    }
+
+    .btn-remove {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--color-slate);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 2px;
+      line-height: 1;
+      transition: color 0.1s;
+    }
+
+    .btn-remove:hover {
+      color: var(--color-error);
+    }
+
+    .btn-remove:focus-visible {
+      outline: 2px solid var(--color-amber);
+      outline-offset: 2px;
+    }
+
+    /* Add material row */
+    .add-material-bar {
+      padding: var(--sp-3) var(--sp-3);
+      background-color: var(--color-fog);
+      border-top: 1px solid var(--color-paper);
+    }
+
+    .btn-add-material {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      background: none;
+      border: 1px dashed var(--color-paper);
+      border-radius: 2px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .btn-add-material:hover {
+      color: var(--color-ink);
+      border-color: var(--color-amber);
+    }
+
+    .btn-add-material:focus-visible {
+      outline: 2px solid var(--color-amber);
+      outline-offset: 2px;
+    }
+
+    /* Results panel */
+    .results-panel {
+      position: sticky;
+      top: calc(var(--nav-height) + var(--sp-4));
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-5);
+    }
+
+    @media (max-width: 899px) {
+      .results-panel {
+        position: static;
+      }
+    }
+
+    .result-card {
+      background-color: var(--color-paper);
+      border: 1px solid var(--color-paper);
+      border-radius: 2px;
+      padding: var(--sp-5);
+    }
+
+    .result-card--ink {
+      background-color: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--sp-3);
+      padding: var(--sp-2) 0;
+      border-bottom: 1px solid var(--color-paper);
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .result-row--ink {
+      border-bottom-color: var(--color-ink-border);
+    }
+
+    .result-label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .result-label--ink {
+      color: var(--color-slate);
+    }
+
+    .result-value {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-ink);
+      text-align: right;
+    }
+
+    .result-value--ink {
+      color: var(--color-fog);
+    }
+
+    .result-value--lg {
+      font-size: 1.5rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .result-value--amber {
+      color: var(--color-amber);
+    }
+
+    /* COGS hero row */
+    .cogs-hero {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+      padding: var(--sp-4) 0;
+    }
+
+    .cogs-hero__label {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--color-slate);
+    }
+
+    .cogs-hero__value {
+      font-family: var(--font-mono);
+      font-size: 2.25rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-fog);
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    /* Margin picker */
+    .margin-picker {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+
+    .margin-picker__label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      letter-spacing: 0.04em;
+    }
+
+    .margin-presets {
+      display: flex;
+      gap: var(--sp-2);
+      flex-wrap: wrap;
+    }
+
+    .margin-btn {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      padding: 6px 12px;
+      border: 1.5px solid var(--color-paper);
+      border-radius: 2px;
+      background: var(--color-fog);
+      color: var(--color-slate);
+      cursor: pointer;
+      transition: border-color 0.1s, color 0.1s, background 0.1s;
+    }
+
+    .margin-btn.is-active,
+    .margin-btn:hover {
+      border-color: var(--color-amber);
+      color: var(--color-ink);
+      background: var(--color-fog);
+    }
+
+    .margin-custom-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .margin-custom-input {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-ink);
+      background-color: var(--color-fog);
+      border: 1px solid var(--color-paper);
+      border-radius: 2px;
+      padding: 6px 8px;
+      width: 64px;
+      text-align: right;
+    }
+
+    .margin-custom-input:focus {
+      outline: none;
+      border-color: var(--color-amber);
+    }
+
+    .margin-custom-input:focus-visible {
+      outline: 2px solid var(--color-amber);
+      outline-offset: 2px;
+    }
+
+    /* Empty / error states */
+    .state-empty {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      color: var(--color-slate);
+      font-style: italic;
+    }
+
+    /* Notes beneath results */
+    .result-notes {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+
+    .result-note {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      line-height: 1.5;
+      color: var(--color-slate);
+      padding-left: var(--sp-3);
+      border-left: 1px solid var(--color-paper);
+    }
+
+    /* Reset button */
+    .btn-reset {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-slate);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.1s;
+    }
+
+    .btn-reset:hover {
+      color: var(--color-ink);
+    }
+
+    /* Hero */
+    .calc-hero .container {
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-5);
+    }
+
+    /* Context strip */
+    .context-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-4);
+      padding: var(--sp-4) 0;
+      border-top: 1px solid var(--color-paper);
+      border-bottom: 1px solid var(--color-paper);
+    }
+
+    .context-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      color: var(--color-slate);
+    }
+
+    .context-item::before {
+      content: '';
+      display: block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: var(--color-amber);
+      flex-shrink: 0;
+    }
+
+    /* What's not included callout */
+    .not-included {
+      background-color: var(--color-paper);
+      border-radius: 2px;
+      padding: var(--sp-5);
+    }
+
+    .not-included__title {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-ink);
+      margin-bottom: var(--sp-3);
+    }
+
+    .not-included__list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+
+    .not-included__list li {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: var(--color-slate);
+      padding-left: var(--sp-4);
+      position: relative;
+    }
+
+    .not-included__list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--color-slate);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════════ -->
+<header class="site-header" id="site-header">
+  <div class="site-header__inner">
+
+    <a href="index.html" class="site-header__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#1C3D52" opacity="0.30"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#1C3D52"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#F0F3F5" opacity="0.60"/>
+        <text y="30" font-family="'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#1C3D52">Batch</tspan><tspan font-weight="300" fill="#1C3D52" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <ul class="nav-list" id="nav-list">
+        <li><a href="demo.html"    class="nav-link">Try the demo</a></li>
+        <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+        <li><a href="compare.html" class="nav-link">Compare</a></li>
+        <li><a href="switch.html"  class="nav-link">Switch from Stocksmith</a></li>
+      </ul>
+    </nav>
+
+    <a href="demo.html" class="btn btn--outline nav-cta">Try the demo</a>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-list">
+      <span></span><span></span><span></span>
+    </button>
+
+  </div>
+</header>
+
+
+<!-- ═══════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════ -->
+<section class="hero-section calc-hero">
+  <div class="container">
+    <span class="section-label">Quick COGS calculator</span>
+    <h1 class="t-h1 hero-headline">Your materials cost, per unit — in under a minute.</h1>
+    <p class="t-body-lg hero-subhead">
+      Enter your materials, cost per unit, and how many units you make per batch.
+      The calculator shows your per-unit COGS and a suggested retail price at your target margin.
+      No account. Nothing saved.
+    </p>
+
+    <div class="context-strip">
+      <div class="context-item">Materials cost only — see notes for what to add</div>
+      <div class="context-item">Works for any craft: candles, soap, jewelry, resin, fiber</div>
+      <div class="context-item">Results update as you type</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     CALCULATOR
+════════════════════════════════════════════════ -->
+<section class="section" id="calculator">
+  <div class="container">
+    <div class="calc-layout">
+
+      <!-- LEFT: input area -->
+      <div class="calc-inputs">
+
+        <!-- Batch info -->
+        <div class="batch-bar">
+          <div class="form-field">
+            <label class="form-label" for="batch-name">Batch name (optional)</label>
+            <input
+              class="form-input"
+              type="text"
+              id="batch-name"
+              aria-label="Batch name"
+              value="Soy candle 8oz"
+              maxlength="80"
+            >
+          </div>
+          <div class="form-field" style="flex: 0 0 auto; min-width: 100px; max-width: 140px;">
+            <label class="form-label" for="batch-size">Units per batch</label>
+            <input
+              class="form-input form-input--mono"
+              type="number"
+              id="batch-size"
+              min="1"
+              max="9999"
+              step="1"
+              value="12"
+              aria-label="Units per batch"
+            >
+          </div>
+        </div>
+
+        <!-- Materials table -->
+        <div class="materials-table-wrap" id="materials-table-wrap">
+          <table class="materials-table" aria-label="Materials and costs">
+            <thead>
+              <tr>
+                <th style="min-width:130px;">Material</th>
+                <th style="width:80px; text-align:right;">Qty / batch</th>
+                <th style="width:56px;">Unit</th>
+                <th style="width:90px; text-align:right;">Cost / unit ($)</th>
+                <th style="width:88px; text-align:right;">Line total</th>
+                <th style="width:32px;"></th>
+              </tr>
+            </thead>
+            <tbody id="materials-body">
+              <!-- Rows inserted by JS -->
+            </tbody>
+          </table>
+          <div class="add-material-bar">
+            <button class="btn-add-material" id="btn-add-material" type="button" aria-label="Add a material row">
+              <span aria-hidden="true">+</span> Add material
+            </button>
+          </div>
+        </div>
+
+        <!-- What's not included -->
+        <div class="not-included" style="margin-top: var(--sp-6);">
+          <div class="not-included__title">This calculator covers materials cost only.</div>
+          <ul class="not-included__list">
+            <li>
+              <strong>Your labor</strong> — the time to make each unit. Add your hourly rate × hours per batch ÷ batch size to get a fuller COGS.
+            </li>
+            <li>
+              <strong>Overhead</strong> — equipment, utilities, packaging, workspace proportional to each unit.
+            </li>
+            <li>
+              <strong>Platform fees</strong> — Etsy charges a 6.5% transaction fee plus $0.20 listing fee per item. Shopify fees depend on your plan tier.
+            </li>
+            <li>
+              <strong>Shipping</strong> — if you absorb shipping cost, factor it into your price separately.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Reset control -->
+        <div style="margin-top: var(--sp-4); display:flex; justify-content: flex-end;">
+          <button class="btn-reset" id="btn-reset" type="button">Clear and start over</button>
+        </div>
+
+      </div><!-- /calc-inputs -->
+
+
+      <!-- RIGHT: results panel -->
+      <div class="results-panel" id="results-panel" aria-live="polite" aria-label="COGS calculation results">
+
+        <!-- Per-unit COGS card -->
+        <div class="result-card result-card--ink">
+          <div class="cogs-hero">
+            <div class="cogs-hero__label">Per-unit COGS — materials</div>
+            <div class="cogs-hero__value" id="cogs-per-unit">$0.00</div>
+          </div>
+          <div class="result-row result-row--ink">
+            <span class="result-label result-label--ink">Total batch cost</span>
+            <span class="result-value result-value--ink" id="batch-total">$0.00</span>
+          </div>
+          <div class="result-row result-row--ink" style="border-bottom:none;">
+            <span class="result-label result-label--ink">Batch size</span>
+            <span class="result-value result-value--ink" id="display-batch-size">12 units</span>
+          </div>
+        </div>
+
+        <!-- Margin and price card -->
+        <div class="result-card">
+          <div class="margin-picker" style="margin-bottom: var(--sp-5);">
+            <div class="margin-picker__label">Target gross margin</div>
+            <div class="margin-presets" role="group" aria-label="Margin presets">
+              <button class="margin-btn" data-margin="35" type="button">35%</button>
+              <button class="margin-btn is-active" data-margin="50" type="button">50%</button>
+              <button class="margin-btn" data-margin="65" type="button">65%</button>
+            </div>
+            <div class="margin-custom-wrap">
+              <label class="margin-picker__label" for="margin-custom">Custom</label>
+              <input
+                class="margin-custom-input"
+                type="number"
+                id="margin-custom"
+                min="1"
+                max="99"
+                step="1"
+                aria-label="Custom margin percentage"
+              >
+              <span class="form-label">%</span>
+            </div>
+          </div>
+
+          <div class="result-row">
+            <span class="result-label">Suggested retail price</span>
+            <span class="result-value result-value--lg" id="suggested-price">$0.00</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Gross margin per unit</span>
+            <span class="result-value" id="margin-per-unit">$0.00</span>
+          </div>
+          <div class="result-row" style="border-bottom:none;">
+            <span class="result-label">Margin %</span>
+            <span class="result-value" id="margin-pct-display">50%</span>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="result-notes">
+          <p class="result-note">
+            Gross margin = (price &minus; materials COGS) &divide; price. Does not include labor, overhead, or platform fees.
+          </p>
+          <p class="result-note">
+            Suggested price = materials COGS &divide; (1 &minus; margin). At 50% margin, price is 2&times; materials COGS.
+          </p>
+        </div>
+
+        <!-- CTA to demo -->
+        <div style="padding: var(--sp-5); background-color: var(--color-paper); border-radius: 2px; display:flex; flex-direction:column; gap: var(--sp-3);">
+          <p class="t-body-sm" style="color:var(--color-ink);">
+            The full BatchCOGS demo auto-calculates COGS on every order and deducts materials from stock in real time.
+          </p>
+          <a href="demo.html" class="btn btn--primary btn--full">Try the full demo</a>
+        </div>
+
+      </div><!-- /results-panel -->
+
+    </div><!-- /calc-layout -->
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     HOW THIS RELATES TO FULL BATCHCOGS
+════════════════════════════════════════════════ -->
+<section class="section section--paper">
+  <div class="container">
+    <span class="section-label">From calculator to live tracking</span>
+    <h2 class="t-h2" style="max-width:540px; margin-bottom: var(--sp-3);">This calculator is a one-time estimate. BatchCOGS keeps it current.</h2>
+    <p class="t-body-lg" style="max-width:640px; margin-bottom: var(--sp-8);">
+      Your cost per unit changes every time you restock materials at a different price. In BatchCOGS,
+      you update the cost once and every recipe that uses that material recalculates automatically.
+      When an order arrives on Etsy or Shopify, materials deduct from stock and COGS is recorded per sale.
+    </p>
+
+    <div class="grid-3">
+
+      <div class="card">
+        <h3 class="t-h3" style="margin-bottom: var(--sp-3);">Recipe-based auto-deduction</h3>
+        <p class="t-body-sm">
+          Link materials to each product in a recipe. Every order on Etsy or Shopify deducts the exact materials
+          from your stock — no spreadsheet update required.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="t-h3" style="margin-bottom: var(--sp-3);">COGS per sale, not per batch</h3>
+        <p class="t-body-sm">
+          BatchCOGS logs the materials cost at the moment each order deducts. Your COGS report shows
+          actual cost per unit sold, updated with each material price change.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="t-h3" style="margin-bottom: var(--sp-3);">Stock you can trust</h3>
+        <p class="t-body-sm">
+          Every webhook deduction carries an idempotency key — a duplicate order event does not deduct twice.
+          If a deduction ever looks wrong, the audit log shows every change and you can correct it manually.
+        </p>
+      </div>
+
+    </div>
+
+    <div style="margin-top: var(--sp-8);">
+      <a href="pricing.html" class="link-arrow">
+        Free tier available · Pro is $19/month &rarr;
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     CTA
+════════════════════════════════════════════════ -->
+<section class="section section--dark">
+  <div class="container" style="display:flex; flex-direction:column; gap: var(--sp-5); max-width:680px;">
+    <span class="section-label">Next step</span>
+    <h2 class="t-h2">See how BatchCOGS handles a real order.</h2>
+    <p class="t-body-lg" style="opacity:0.85;">
+      The demo walks through adding materials, building a recipe, connecting Etsy, and watching an order deduct from stock.
+      No account required to see the full flow.
+    </p>
+    <div class="hero-actions">
+      <a href="demo.html" class="btn btn--primary">Try the demo</a>
+      <a href="switch.html" class="btn btn--ghost">Switching from Stocksmith?</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+
+    <a href="index.html" class="site-footer__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#F0F3F5" opacity="0.30"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#F0F3F5"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.55"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.55"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#1C3D52" opacity="0.35"/>
+        <text y="30" font-family="'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#F0F3F5">Batch</tspan><tspan font-weight="300" fill="#F0F3F5" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+
+    <nav aria-label="Footer navigation" class="site-footer__nav">
+      <a href="demo.html"    class="footer-link">Try the demo</a>
+      <a href="pricing.html" class="footer-link">Pricing</a>
+      <a href="compare.html" class="footer-link">Compare</a>
+      <a href="switch.html"  class="footer-link">Switch from Stocksmith</a>
+    </nav>
+
+    <p class="t-caption site-footer__copy">
+      &copy; 2026 BatchCOGS &middot;
+      <a href="mailto:hello@batchcogs.com" class="footer-link">hello@batchcogs.com</a>
+    </p>
+
+  </div>
+</footer>
+
+
+<!-- Mobile navigation toggle — vanilla JS, no external dependencies -->
+<script>
+  (function () {
+    var header = document.getElementById('site-header');
+    var toggle = document.getElementById('nav-toggle');
+    if (!header || !toggle) return;
+
+    toggle.addEventListener('click', function () {
+      var isOpen = header.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      toggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && header.classList.contains('nav-open')) {
+        header.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+        toggle.focus();
+      }
+    });
+
+    var navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function () {
+        header.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+      });
+    });
+  }());
+</script>
+
+<!-- COGS Calculator — pure JS, no external libraries -->
+<script>
+  (function () {
+
+    /* ── Data ── */
+    var materials = [
+      { name: 'Soy wax', qty: 7.5, unit: 'oz', cost: 0.14 },
+      { name: 'Fragrance oil', qty: 0.75, unit: 'oz', cost: 1.80 },
+      { name: 'Glass jar 8oz', qty: 1, unit: 'each', cost: 0.95 },
+      { name: 'Cotton wick', qty: 1, unit: 'each', cost: 0.12 }
+    ];
+
+    var batchSize   = 12;
+    var marginPct   = 50;
+
+    /* ── Helpers ── */
+    function fmt(n) {
+      if (!isFinite(n) || isNaN(n)) return '—';
+      return '$' + n.toFixed(2);
+    }
+
+    function fmtPct(n) {
+      if (!isFinite(n) || isNaN(n)) return '—';
+      return n.toFixed(1) + '%';
+    }
+
+    function getNum(el) {
+      var v = parseFloat(el.value);
+      return (isNaN(v) || v < 0) ? 0 : v;
+    }
+
+    /* ── Calculation ── */
+    function recalc() {
+      var batchSizeEl = document.getElementById('batch-size');
+      batchSize = Math.max(1, Math.round(getNum(batchSizeEl))) || 1;
+
+      // Read materials from DOM rows
+      var rows = document.querySelectorAll('#materials-body .mat-row');
+      var batchTotal = 0;
+      rows.forEach(function (row, idx) {
+        var qtyEl  = row.querySelector('.mat-qty');
+        var costEl = row.querySelector('.mat-cost');
+        var totalEl = row.querySelector('.mat-line-total');
+
+        var qty  = getNum(qtyEl);
+        var cost = getNum(costEl);
+        var lineTotal = qty * cost;
+        batchTotal += lineTotal;
+
+        totalEl.textContent = lineTotal > 0 ? fmt(lineTotal) : '—';
+        totalEl.classList.toggle('mat-total--empty', lineTotal === 0);
+      });
+
+      var cogsPerUnit = batchSize > 0 ? batchTotal / batchSize : 0;
+
+      // Suggested price
+      var mPct = marginPct / 100;
+      var suggestedPrice = (mPct >= 0 && mPct < 1 && cogsPerUnit > 0)
+        ? cogsPerUnit / (1 - mPct)
+        : 0;
+      var marginPerUnit = suggestedPrice - cogsPerUnit;
+
+      // Update displays
+      document.getElementById('cogs-per-unit').textContent    = fmt(cogsPerUnit);
+      document.getElementById('batch-total').textContent      = fmt(batchTotal);
+      document.getElementById('display-batch-size').textContent = batchSize + (batchSize === 1 ? ' unit' : ' units');
+      document.getElementById('suggested-price').textContent  = suggestedPrice > 0 ? fmt(suggestedPrice) : '—';
+      document.getElementById('margin-per-unit').textContent  = marginPerUnit > 0 ? fmt(marginPerUnit) : '—';
+      document.getElementById('margin-pct-display').textContent = fmtPct(marginPct);
+    }
+
+    /* ── Material row rendering ── */
+    var rowCount = 0;
+
+    function createRow(mat) {
+      rowCount++;
+      var id = rowCount;
+      var tr = document.createElement('tr');
+      tr.className = 'mat-row';
+      tr.dataset.id = id;
+
+      tr.innerHTML = [
+        '<td class="td-input">',
+          '<input class="mat-input mat-input--name"',
+                 'type="text"',
+                 'aria-label="Material name"',
+                 'value="' + escAttr(mat.name) + '"',
+                 'maxlength="60">',
+        '</td>',
+        '<td class="td-input">',
+          '<input class="mat-input mat-input--mono mat-input--num mat-qty"',
+                 'type="number"',
+                 'aria-label="Quantity per batch"',
+                 'value="' + mat.qty + '"',
+                 'min="0" step="any">',
+        '</td>',
+        '<td class="td-input">',
+          '<input class="mat-input mat-input--unit"',
+                 'type="text"',
+                 'aria-label="Unit of measure"',
+                 'value="' + escAttr(mat.unit) + '"',
+                 'maxlength="10">',
+        '</td>',
+        '<td class="td-input">',
+          '<input class="mat-input mat-input--mono mat-input--cost mat-cost"',
+                 'type="number"',
+                 'aria-label="Cost per unit in dollars"',
+                 'value="' + mat.cost + '"',
+                 'min="0" step="any">',
+        '</td>',
+        '<td><div class="mat-total mat-total--empty">—</div></td>',
+        '<td>',
+          '<button class="btn-remove" type="button" aria-label="Remove this material">&times;</button>',
+        '</td>'
+      ].join('');
+
+      var removeBtn = tr.querySelector('.btn-remove');
+      removeBtn.addEventListener('click', function () {
+        tr.parentNode.removeChild(tr);
+        recalc();
+      });
+
+      var inputs = tr.querySelectorAll('input');
+      inputs.forEach(function (inp) {
+        inp.addEventListener('input', recalc);
+      });
+
+      return tr;
+    }
+
+    function escAttr(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    /* ── Initialize rows ── */
+    var tbody = document.getElementById('materials-body');
+
+    materials.forEach(function (mat) {
+      tbody.appendChild(createRow(mat));
+    });
+
+    /* ── Add material button ── */
+    document.getElementById('btn-add-material').addEventListener('click', function () {
+      var newRow = createRow({ name: '', qty: 1, unit: 'each', cost: 0 });
+      tbody.appendChild(newRow);
+      newRow.querySelector('.mat-input--name').focus();
+      recalc();
+    });
+
+    /* ── Batch size changes ── */
+    document.getElementById('batch-size').addEventListener('input', recalc);
+
+    /* ── Margin presets ── */
+    document.querySelectorAll('.margin-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.margin-btn').forEach(function (b) {
+          b.classList.remove('is-active');
+        });
+        btn.classList.add('is-active');
+        marginPct = parseFloat(btn.dataset.margin);
+        document.getElementById('margin-custom').value = '';
+        recalc();
+      });
+    });
+
+    /* ── Custom margin input ── */
+    document.getElementById('margin-custom').addEventListener('input', function () {
+      var v = parseFloat(this.value);
+      if (!isNaN(v) && v > 0 && v < 100) {
+        marginPct = v;
+        document.querySelectorAll('.margin-btn').forEach(function (b) {
+          b.classList.remove('is-active');
+        });
+        recalc();
+      }
+    });
+
+    /* ── Reset ── */
+    document.getElementById('btn-reset').addEventListener('click', function () {
+      // Confirm before clearing
+      if (!window.confirm('Clear all materials and start over?')) { return; }
+
+      while (tbody.firstChild) { tbody.removeChild(tbody.firstChild); }
+      document.getElementById('batch-size').value = '12';
+      document.getElementById('batch-name').value = '';
+      document.getElementById('margin-custom').value = '';
+      marginPct = 50;
+      document.querySelectorAll('.margin-btn').forEach(function (b) {
+        b.classList.toggle('is-active', b.dataset.margin === '50');
+      });
+
+      // Add one empty row
+      tbody.appendChild(createRow({ name: '', qty: 1, unit: 'each', cost: 0 }));
+      tbody.querySelector('.mat-input--name').focus();
+      recalc();
+    });
+
+    /* ── Initial calculation ── */
+    recalc();
+
+  }());
+</script>
+
+</body>
+</html>

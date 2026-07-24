@@ -31,7 +31,7 @@ Source: [https://www.capterra.com/p/144117/Craftybase/reviews/](https://www.capt
 > "when you sell a product the software will NOT automatically deduct the materials from your inventory UNLESS you pay for a more expensive plan"
 Source: [https://www.softwareadvice.com/inventory-management/craftybase-profile/reviews/](https://www.softwareadvice.com/inventory-management/craftybase-profile/reviews/)
 
-Legacy pricing was approximately $19–20/month; the increase to $83–99/month is a roughly 5x step confirmed by both the pricing page and named reviewer testimony. The old domain, craftybase.com, now redirects to stocksmith.io with no content, no legacy plans, and no sign-up UI — the previous product tier is gone ([https://stocksmith.io/pricing](https://stocksmith.io/pricing)).
+Precision matters here (re-verified live 2026-07-24 after an external challenge): Stocksmith still sells cheap entry tiers — a Pro plan at $20/month appears in the pricing FAQ, and Studio is $41–49/month. **But the core job — automated production assemblies (auto-deducting materials when orders come in) — is gated at Indie, $83–99/month**, per the feature comparison matrix ([https://stocksmith.io/pricing](https://stocksmith.io/pricing)). That is what named reviewers describe: Liza K.'s "$1,000/year" for auto-deduction matches Indie annual ($83×12 = $996), and her "money grab… block the 'auto-manufacture' feature to force you to upgrade" quote describes exactly this gating ([Capterra](https://www.capterra.com/p/144117/Craftybase/reviews/)). The "5x" figure is Raven T.'s own reported experience ("literally my price went up that much"), quoted as testimony — the structural claim we rely on is narrower: **the cheapest tier that does the auto-deduction job costs $83+/month.** The old domain, craftybase.com, redirects to stocksmith.io/pricing.
 
 ### Why Alternatives Fail
 
@@ -73,7 +73,7 @@ Buildable solo in approximately four weeks with a standard web stack (Next.js or
 - Production log: optional manual batch logging
 
 ### Channel integrations (the differentiator)
-- Etsy OAuth + webhook (`receipt` create event): on sale, look up product recipe, deduct materials
+- Etsy OAuth + webhook (`receipt` create event): on sale, look up product recipe, deduct materials. **Launch dependency (verified 2026-07-24):** Etsy's Open API requires a two-step approval for multi-tenant use — Personal App review first, then a manual "Commercial Access" review ([https://developers.etsy.com/documentation/](https://developers.etsy.com/documentation/)). This must be applied for before launch; until approved, CSV order import is the fallback ingestion path. (Webhooks are listed in Etsy's current API Essentials, so push-based sync is available once access is granted.)
 - Shopify OAuth + webhook (`orders/paid`): same logic
 - Sync status dashboard: last sync timestamp, errors surfaced plainly
 
@@ -122,9 +122,9 @@ Numbers that are URL-traced from verified sources:
 
 ## Why Now — The Displacement Window
 
-The Craftybase-to-Stocksmith rebrand completed in July 2026. The domain redirect is live; no legacy plans remain. This creates a specific, time-bounded window:
+The Craftybase-to-Stocksmith rebrand completed in July 2026. The domain redirect is live. Cheap Stocksmith tiers still exist (Pro $20, Studio $41–49), but none documented to include auto-deduction below Indie $83–99/month. This creates a specific, time-bounded window:
 
-1. Former Craftybase users at $19–24/month have just been forced to either pay $990/year or leave. Many are actively searching. *Inference (unmeasured):* the search term "craftybase alternative" appears underserved by authoritative content as of July 2026 — this is an impression from the research sweeps, not a measured SEO statistic.
+1. Former Craftybase users who relied on auto-deduction at legacy ~$19–24/month pricing must now pay ~$990/year for that feature, drop to a tier without it, or leave. Many are actively searching. *Inference (unmeasured):* the search term "craftybase alternative" appears underserved by authoritative content as of July 2026 — this is an impression from the research sweeps, not a measured SEO statistic.
 2. The named complainants on Capterra (Raven T., Liza K., and others) are self-identified, reachable users with documented pain. Direct outreach is viable.
 3. FormulaLedger's current gap (no sales channel integration) is closable. Once they add Etsy/Shopify webhooks, the differentiation narrows sharply.
 
@@ -147,6 +147,6 @@ The window is estimated at 12–24 months before either FormulaLedger closes the
 
 ## Summary
 
-The pain is real, documented, and current. The market leader abandoned the sub-$25 segment in 2024 via a 5x price increase. The two affordable alternatives each have a documented fatal flaw: Inventora breaks inventory data; Ardent Seller is Etsy-only with zero independent reviews. FormulaLedger is the sharpest emerging threat but currently lacks sales channel integration.
+The pain is real, documented, and current. The market leader repriced the core auto-deduction job out of the sub-$25 segment (gated at $83+/month since the 2024 increase). The affordable alternatives each have a documented fatal flaw: Inventora breaks inventory data; Ardent Seller is Etsy-only with zero independent reviews; FormulaLedger — the sharpest emerging threat — currently lacks sales channel integration. The category's low end is contested by multiple young entrants, which is why the defensible position is reliability + integration, not price alone.
 
 The strongest honest business here is a focused, reliable tool that wins the trust race — not the feature race. The moat is thin and time-bounded. The window is real. The mandate is: ship, establish reliability proof (idempotency guarantees, public status page, responsive support), and earn the "reliable" brand in a category where that word is not yet owned.
