@@ -12,8 +12,8 @@ Single source of truth for gate status. Updated at every phase close; a RED gate
 | G3b | AMBER | Brand guidelines complete (stranger test) + voice-rules.md exists | checklist in brand/ | **PASS 2026-07-23 (guidelines, 2 logos, voice-rules w/ inference label)** |
 | G3c | AMBER | Domain availability checked via RDAP, receipt saved | evidence file | **PASS 2026-07-23: batchcogs.com RDAP 404 (available), receipts in brand/naming.md** |
 | G4 | RED | Site opens locally, 390px+1440px screenshots reviewed, 0 console errors | `node tools/screenshot.mjs` (exit 3 on console errors) + `tools/demo-test.mjs` | **PASS 2026-07-24: 12 shots clean, calculator bug caught+fixed, demo idempotency functionally proven** |
-| G5 | RED | Both videos render, play, frames watched | `tools/encode-video.mjs` VERIFY + frame review | pending |
-| G5b | AMBER | Founder script passes voice-rules checklist | brand/voice-rules.md checklist | pending |
+| G5 | RED | Both videos render, play, frames watched | `tools/encode-video.mjs` VERIFY + frame review | **PASS 2026-07-24: 45s+40s mp4s, 9 sampled frames reviewed from encoded output** |
+| G5b | AMBER | Founder script passes voice-rules checklist | brand/voice-rules.md checklist | **PASS 2026-07-24 (rule-by-rule author check + frame spot-check)** |
 | G6 | RED | recap.html + docs: 0 broken links | `node tools/linkcheck.mjs` → `broken=0` | pending |
 | G7 | RED | 0 placeholders in deliverables | grep TODO/lorem/FIXME/placeholder → 0 hits | pending |
 | G8 | RED | Red-team objections visible verbatim in final docs | red-team doc linked from recap | pending |

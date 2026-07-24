@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BatchCOGS Founder Scene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: #0D1E28;
+  font-family: 'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif;
+  color: #F0F3F5;
+  position: relative;
+}
+
+/* ── Subtle grid overlay — adds depth without noise ── */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(28, 61, 82, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 61, 82, 0.18) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Logo bar (persistent top strip) ── */
+#logo-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 0 64px;
+  z-index: 100;
+  border-bottom: 1px solid #1C3D52;
+  background: rgba(13, 30, 40, 0.70);
+}
+
+/* ── Caption bar ── */
+#caption-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 64px;
+  background: rgba(13, 30, 40, 0.88);
+  border-top: 1px solid #24404F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 120px;
+  z-index: 200;
+}
+#caption-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: #F0F3F5;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Panels ── */
+.panel {
+  position: absolute;
+  top: 72px; left: 0;
+  width: 1280px;
+  height: 584px; /* 720 - 72 logo - 64 caption */
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 160px;
+  z-index: 10;
+}
+
+/* ── Text panels (main content) ── */
+.text-block {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+
+.text-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.text-primary {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #F0F3F5;
+  text-wrap: balance;
+}
+
+.text-primary .amber-num {
+  color: #D4911F;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.text-secondary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #7A9BAA;
+  margin-top: 16px;
+  text-wrap: balance;
+}
+
+.fact-bar {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: #162A38;
+  border: 1px solid #24404F;
+  border-left: 4px solid #D4911F;
+  border-radius: 6px;
+  padding: 20px 32px;
+  margin-top: 28px;
+  width: 100%;
+  max-width: 700px;
+}
+.fact-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fact-bar-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+}
+.fact-bar-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: #F0F3F5;
+  font-variant-numeric: tabular-nums;
+}
+.fact-bar-value.amber { color: #D4911F; }
+.fact-bar-divider {
+  width: 1px;
+  height: 40px;
+  background: #24404F;
+}
+
+/* ── Sub-elements within product panel ── */
+.line-a, .line-b, .line-c { opacity: 0; }
+
+/* ── Limitation panel ── */
+.limitation-card {
+  background: rgba(212, 145, 31, 0.08);
+  border: 1px solid rgba(212, 145, 31, 0.30);
+  border-radius: 8px;
+  padding: 24px 36px;
+  max-width: 680px;
+  width: 100%;
+  text-align: left;
+}
+.limitation-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: #D4911F;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.limitation-text {
+  font-size: 18px;
+  font-weight: 400;
+  color: #F0F3F5;
+  line-height: 1.55;
+}
+
+/* ── Close panel ── */
+#panel-close {
+  gap: 20px;
+}
+#close-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+#close-url {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  font-weight: 400;
+  color: #F0F3F5;
+  letter-spacing: 0.02em;
+}
+#close-tagline {
+  font-size: 15px;
+  font-weight: 400;
+  color: #7A9BAA;
+  text-align: center;
+}
+#close-price-line {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: #D4911F;
+  margin-top: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- ── Logo bar (persistent) ── -->
+<div id="logo-bar">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" width="160" height="37" role="img" aria-label="BatchCOGS">
+    <rect x="7" y="7" width="29" height="33" rx="2" fill="#F0F3F5" opacity="0.28"/>
+    <rect x="3" y="3" width="29" height="33" rx="2" fill="#F0F3F5"/>
+    <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+    <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+    <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+    <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+    <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+    <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#1C3D52" opacity="0.50"/>
+    <text y="30" font-family="'DM Sans','Gill Sans MT','Century Gothic',system-ui,sans-serif" font-size="21.5" letter-spacing="-0.2">
+      <tspan x="46" font-weight="600" fill="#F0F3F5">Batch</tspan><tspan font-weight="300" fill="#F0F3F5" letter-spacing="1.2">COGS</tspan>
+    </text>
+  </svg>
+</div>
+
+<!-- ── PANEL: FACT (0–8s) ── -->
+<div class="panel" id="panel-fact">
+  <div class="text-block">
+    <div class="text-label">July 2026</div>
+    <div class="text-primary">Craftybase rebranded to Stocksmith and moved automatic material deduction to an <span class="amber-num">$83</span>/month plan.</div>
+    <div class="fact-bar">
+      <div class="fact-bar-item">
+        <span class="fact-bar-label">Before</span>
+        <span class="fact-bar-value">~$19/mo</span>
+      </div>
+      <div class="fact-bar-divider"></div>
+      <div class="fact-bar-item">
+        <span class="fact-bar-label">After (Stocksmith Indie)</span>
+        <span class="fact-bar-value amber">$83&ndash;99/mo</span>
+      </div>
+      <div class="fact-bar-divider"></div>
+      <div class="fact-bar-item">
+        <span class="fact-bar-label">Annual cost</span>
+        <span class="fact-bar-value amber">$990/yr</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PANEL: WHY (8–16s) ── -->
+<div class="panel" id="panel-why">
+  <div class="text-block">
+    <div class="text-label">Why I built this</div>
+    <div class="text-primary">I built BatchCOGS because that feature should cost <span class="amber-num">$19</span> a month, not eighty-three.</div>
+    <div class="text-secondary">Recipe-based auto-deduction is a basic accounting function for handmade sellers. The price should reflect that.</div>
+  </div>
+</div>
+
+<!-- ── PANEL: PRODUCT (16–30s) ── -->
+<div class="panel" id="panel-product">
+  <div class="text-block">
+    <div class="text-label" style="margin-bottom:24px">How it works</div>
+    <div class="text-primary line-a" id="prod-line-a">It connects to Etsy and Shopify.</div>
+    <div class="text-primary line-b" id="prod-line-b" style="margin-top:16px">You define a recipe for each product.</div>
+    <div class="text-primary line-c" id="prod-line-c" style="margin-top:16px">When an order comes in, your materials deduct automatically.</div>
+  </div>
+</div>
+
+<!-- ── PANEL: RELIABILITY (30–36s) ── -->
+<div class="panel" id="panel-reliability">
+  <div class="text-block">
+    <div class="text-label">What gets logged</div>
+    <div class="text-primary">Every deduction is logged.</div>
+    <div class="text-secondary" style="margin-top:20px">If something goes wrong, you correct it manually &mdash; and the change is recorded. Every correction is in the audit history.</div>
+  </div>
+</div>
+
+<!-- ── PANEL: LIMITATION (36–38s) ── -->
+<div class="panel" id="panel-limitation">
+  <div class="limitation-card">
+    <div class="limitation-label">One honest limit</div>
+    <div class="limitation-text">New accounts start with CSV import while Etsy API approval processes. Webhook-based sync activates once access is granted.</div>
+  </div>
+</div>
+
+<!-- ── PANEL: CLOSE (38–40s) ── -->
+<div class="panel" id="panel-close">
+  <div id="close-logo-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" width="336" height="77" role="img" aria-label="BatchCOGS">
+      <rect x="7" y="7" width="29" height="33" rx="2" fill="#F0F3F5" opacity="0.28"/>
+      <rect x="3" y="3" width="29" height="33" rx="2" fill="#F0F3F5"/>
+      <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+      <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+      <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+      <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+      <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+      <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#1C3D52" opacity="0.50"/>
+      <text y="30" font-family="'DM Sans','Gill Sans MT','Century Gothic',system-ui,sans-serif" font-size="21.5" letter-spacing="-0.2">
+        <tspan x="46" font-weight="600" fill="#F0F3F5">Batch</tspan><tspan font-weight="300" fill="#F0F3F5" letter-spacing="1.2">COGS</tspan>
+      </text>
+    </svg>
+  </div>
+  <div id="close-url">batchcogs.com</div>
+  <div id="close-price-line">$19/month</div>
+  <div id="close-tagline">Recipe-based COGS tracking for handmade sellers. Etsy and Shopify.</div>
+</div>
+
+<!-- ── Caption bar ── -->
+<div id="caption-bar">
+  <div id="caption-text"></div>
+</div>
+
+<script>
+// ── Utilities ──────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
+
+function sceneFade(t, s, e, fi, fo) {
+  fi = fi === undefined ? 0.4 : fi;
+  fo = fo === undefined ? 0.4 : fo;
+  if (t <= s)      return 0;
+  if (t <= s + fi) return (t - s) / fi;
+  if (t <= e - fo) return 1;
+  if (t <= e)      return (e - t) / fo;
+  return 0;
+}
+
+function thresh(t, tShow, dur) {
+  dur = dur === undefined ? 0.4 : dur;
+  return clamp((t - tShow) / dur, 0, 1);
+}
+
+// ── Caption data ───────────────────────────────────────────────────────────
+var CAPTIONS = [
+  { s:  0, e:  8, text: 'In July 2026, Craftybase rebranded to Stocksmith and put automatic material deduction behind an $83/month plan.' },
+  { s:  8, e: 16, text: 'I built BatchCOGS because that feature should cost $19 a month, not $83.' },
+  { s: 16, e: 21, text: 'It connects to Etsy and Shopify.' },
+  { s: 21, e: 25, text: 'You define a recipe for each product.' },
+  { s: 25, e: 30, text: 'When an order comes in, your materials deduct automatically.' },
+  { s: 30, e: 36, text: 'Every deduction is logged. If something goes wrong, you correct it manually — and the change is recorded.' },
+  { s: 36, e: 38, text: 'One honest limit: new accounts start with CSV import while Etsy API approval processes.' },
+  { s: 38, e: 40, text: 'BatchCOGS Pro is $19 a month. batchcogs.com.' },
+];
+
+// ── Panel references ───────────────────────────────────────────────────────
+var pFact        = document.getElementById('panel-fact');
+var pWhy         = document.getElementById('panel-why');
+var pProduct     = document.getElementById('panel-product');
+var pReliability = document.getElementById('panel-reliability');
+var pLimitation  = document.getElementById('panel-limitation');
+var pClose       = document.getElementById('panel-close');
+
+var elProdA = document.getElementById('prod-line-a');
+var elProdB = document.getElementById('prod-line-b');
+var elProdC = document.getElementById('prod-line-c');
+
+var elCaption = document.getElementById('caption-text');
+
+// ── window.seek — pure function of t ──────────────────────────────────────
+window.seek = function(t) {
+  // 1. Panel opacities
+  pFact.style.opacity        = sceneFade(t,  0,  8.5, 0.3, 0.4);
+  pWhy.style.opacity         = sceneFade(t,  8, 16.5, 0.4, 0.4);
+  pProduct.style.opacity     = sceneFade(t, 16, 30.5, 0.4, 0.4);
+  pReliability.style.opacity = sceneFade(t, 30, 36.5, 0.4, 0.4);
+  pLimitation.style.opacity  = sceneFade(t, 36, 38.5, 0.3, 0.3);
+  pClose.style.opacity       = sceneFade(t, 38, 41,   0.5, 0);
+
+  // 2. Product panel: staggered line reveal
+  elProdA.style.opacity = thresh(t, 16.4);
+  elProdB.style.opacity = thresh(t, 21.2);
+  elProdC.style.opacity = thresh(t, 25.2);
+
+  // 3. Caption
+  var text = '';
+  for (var i = 0; i < CAPTIONS.length; i++) {
+    var c = CAPTIONS[i];
+    if (t >= c.s && t < c.e) { text = c.text; break; }
+  }
+  elCaption.textContent = text;
+};
+
+// Initialise at t=0
+window.seek(0);
+</script>
+</body>
+</html>

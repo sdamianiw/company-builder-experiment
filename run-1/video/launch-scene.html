@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BatchCOGS Launch Scene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: #0D1E28;
+  font-family: 'DM Sans', 'Gill Sans MT', 'Century Gothic', system-ui, sans-serif;
+  color: #F0F3F5;
+  position: relative;
+}
+
+/* ── Panel system ── */
+.panel {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1280px;
+  height: 648px; /* 720 - 72px caption bar */
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 80px;
+}
+
+/* ── Caption bar ── */
+#caption-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
+  background: rgba(13, 30, 40, 0.92);
+  border-top: 1px solid #24404F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 120px;
+  z-index: 200;
+}
+#caption-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 19px;
+  font-weight: 400;
+  color: #F0F3F5;
+  text-align: center;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
+/* ── Utility ── */
+.label-sm {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+}
+.amber { color: #D4911F; }
+.fog   { color: #F0F3F5; }
+.slate { color: #7A9BAA; }
+.ink   { color: #1C3D52; }
+
+/* ══════════════════════════════════════════
+   PANEL: HOOK
+══════════════════════════════════════════ */
+#panel-hook {
+  gap: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+#hook-rebrand-label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+#hook-price-block {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  margin-bottom: 48px;
+}
+.hook-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.hook-price-num {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: 72px;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hook-price-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #7A9BAA;
+}
+.hook-arrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 40px;
+  font-weight: 300;
+  color: #D4911F;
+  line-height: 1;
+}
+
+#hook-source {
+  font-size: 13px;
+  font-weight: 400;
+  color: #7A9BAA;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   PANEL: PAIN (quote cards)
+══════════════════════════════════════════ */
+#panel-pain {
+  gap: 0;
+  justify-content: center;
+}
+
+.quote-card {
+  width: 840px;
+  background: #162A38;
+  border: 1px solid #24404F;
+  border-left: 4px solid #D4911F;
+  border-radius: 6px;
+  padding: 32px 40px;
+  margin-bottom: 0;
+}
+.quote-card-text {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: #F0F3F5;
+  margin-bottom: 16px;
+}
+.quote-card-attribution {
+  font-size: 13px;
+  font-weight: 500;
+  color: #7A9BAA;
+  letter-spacing: 0.03em;
+}
+
+#quote-raven { margin-bottom: 0; }
+#quote-liza  { margin-top: 0; }
+
+/* ══════════════════════════════════════════
+   PANEL: PRODUCT
+══════════════════════════════════════════ */
+#panel-product {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 64px;
+}
+
+.product-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Recipe card */
+#recipe-card {
+  width: 480px;
+  background: #162A38;
+  border: 1px solid #24404F;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.recipe-card-header {
+  background: #1C3D52;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.recipe-card-header-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+}
+.recipe-card-header-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #F0F3F5;
+}
+.recipe-table {
+  width: 100%;
+  border-collapse: collapse;
+  padding: 8px 0;
+}
+.recipe-table tr {
+  border-bottom: 1px solid #1C3D52;
+}
+.recipe-table tr:last-child { border-bottom: none; }
+.recipe-table td {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #F0F3F5;
+}
+.recipe-table .td-bullet {
+  width: 20px;
+  padding-right: 0;
+}
+.recipe-bullet {
+  width: 7px; height: 7px;
+  background: #D4911F;
+  border-radius: 1px;
+  display: inline-block;
+}
+.recipe-table .td-mat  { color: #F0F3F5; }
+.recipe-table .td-qty  { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #7A9BAA; text-align: right; font-variant-numeric: tabular-nums; }
+.recipe-table .td-cost { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #7A9BAA; text-align: right; font-variant-numeric: tabular-nums; }
+.recipe-table .td-line { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #F0F3F5; text-align: right; font-variant-numeric: tabular-nums; }
+.recipe-cogs-row {
+  padding: 12px 20px;
+  border-top: 1px solid #24404F;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.recipe-cogs-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+}
+.recipe-cogs-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: #D4911F;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Order event card */
+#order-event {
+  width: 480px;
+  background: #162A38;
+  border: 1px solid #24404F;
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.order-event-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #2A7A4A;
+  flex-shrink: 0;
+}
+.order-event-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #F0F3F5;
+  line-height: 1.4;
+}
+.order-event-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #7A9BAA;
+  margin-top: 2px;
+}
+
+/* Deduction result panel */
+#deduct-result {
+  width: 480px;
+  background: #162A38;
+  border: 1px solid #24404F;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.deduct-header {
+  padding: 10px 20px;
+  background: #1C3D52;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+}
+.deduct-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 20px;
+  border-bottom: 1px solid #1C3D52;
+  font-size: 13px;
+}
+.deduct-row:last-child { border-bottom: none; }
+.deduct-mat { color: #F0F3F5; }
+.deduct-before {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: #7A9BAA;
+  text-decoration: line-through;
+  font-variant-numeric: tabular-nums;
+}
+.deduct-arrow-sm { color: #D4911F; font-size: 11px; margin: 0 6px; }
+.deduct-after {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: #F0F3F5;
+  font-variant-numeric: tabular-nums;
+}
+.deduct-change {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #A0291E;
+  font-variant-numeric: tabular-nums;
+}
+
+/* COGS result */
+#cogs-result {
+  width: 480px;
+  background: #1C3D52;
+  border: 1px solid #D4911F;
+  border-radius: 6px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cogs-result-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #7A9BAA;
+}
+.cogs-result-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  color: #D4911F;
+  font-variant-numeric: tabular-nums;
+}
+
+/* right col label */
+#product-right-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ══════════════════════════════════════════
+   PANEL: RELIABILITY
+══════════════════════════════════════════ */
+#panel-reliability {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+#reliability-heading {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #F0F3F5;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.audit-log {
+  width: 760px;
+  background: #0D1E28;
+  border: 1px solid #24404F;
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.audit-log-header {
+  padding: 10px 20px;
+  background: #162A38;
+  border-bottom: 1px solid #24404F;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: #7A9BAA;
+  text-transform: uppercase;
+  display: grid;
+  grid-template-columns: 120px 160px 180px 1fr;
+  gap: 8px;
+}
+.audit-log-row {
+  display: grid;
+  grid-template-columns: 120px 160px 180px 1fr;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #162A38;
+  align-items: center;
+}
+.audit-log-row:last-child { border-bottom: none; }
+.audit-col-order  { font-size: 13px; color: #7A9BAA; }
+.audit-col-time   { font-size: 13px; color: #7A9BAA; }
+.audit-col-status { font-size: 13px; }
+.audit-col-note   { font-size: 12px; }
+.status-ok        { color: #2A7A4A; }
+.status-blocked   { color: #D4911F; }
+.note-ok          { color: #F0F3F5; }
+.note-blocked     { color: #D4911F; }
+
+#blocked-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(212, 145, 31, 0.10);
+  border: 1px solid rgba(212, 145, 31, 0.35);
+  border-radius: 6px;
+  padding: 14px 24px;
+  width: 760px;
+}
+.blocked-badge-icon {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid #D4911F;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  color: #D4911F;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.blocked-badge-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #D4911F;
+  line-height: 1.4;
+}
+
+/* ══════════════════════════════════════════
+   PANEL: PRICING
+══════════════════════════════════════════ */
+#panel-pricing {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+#pricing-heading {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #F0F3F5;
+  text-align: center;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 260px 240px 240px;
+  gap: 0;
+  border: 1px solid #24404F;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 740px;
+}
+.pricing-grid-header {
+  display: contents;
+}
+.pgcell {
+  padding: 16px 20px;
+  border-bottom: 1px solid #162A38;
+  border-right: 1px solid #162A38;
+  font-size: 14px;
+  font-weight: 400;
+  color: #7A9BAA;
+  background: #0D1E28;
+}
+.pgcell:nth-child(3n) { border-right: none; }
+.pgcell.row-last { border-bottom: none; }
+
+.pgcell-head {
+  background: #1C3D52;
+  font-size: 13px;
+  font-weight: 600;
+  color: #F0F3F5;
+  text-align: center;
+}
+.pgcell-head.highlight {
+  background: #162A38;
+  border-bottom: 2px solid #D4911F;
+}
+.pgcell-feature { color: #7A9BAA; font-size: 13px; }
+.pgcell-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #F0F3F5;
+}
+.pgcell-val.amber-val { color: #D4911F; font-weight: 500; font-size: 15px; }
+.pgcell-val.muted-val { color: #7A9BAA; }
+.pgcell-check { color: #2A7A4A; font-size: 16px; text-align: center; }
+.pgcell-slash { color: #A0291E; text-align: center; font-size: 16px; }
+
+.pricing-note {
+  font-size: 13px;
+  font-weight: 400;
+  color: #7A9BAA;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   PANEL: CLOSE
+══════════════════════════════════════════ */
+#panel-close {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+#close-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#close-url {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 28px;
+  font-weight: 400;
+  color: #F0F3F5;
+  letter-spacing: 0.02em;
+}
+
+#close-tagline {
+  font-size: 16px;
+  font-weight: 400;
+  color: #7A9BAA;
+  text-align: center;
+}
+
+/* ── Sub-element fade targets ── */
+#order-event, #deduct-result, #cogs-result,
+#log-line-1, #log-line-2, #blocked-badge {
+  opacity: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ── PANEL: HOOK ── -->
+<div class="panel" id="panel-hook">
+  <div id="hook-rebrand-label">Craftybase &rarr; Stocksmith &mdash; July 2026</div>
+  <div id="hook-price-block">
+    <div class="hook-price">
+      <div class="hook-price-num fog">$19<span style="font-size:32px;font-weight:300">/mo</span></div>
+      <div class="hook-price-label">Craftybase legacy price<br>for auto-deduction</div>
+    </div>
+    <div class="hook-arrow">&rarr;</div>
+    <div class="hook-price">
+      <div class="hook-price-num amber">$83<span style="font-size:32px;font-weight:300">/mo</span></div>
+      <div class="hook-price-label">Stocksmith Indie price<br>for the same feature</div>
+    </div>
+  </div>
+  <div id="hook-source">Source: stocksmith.io/pricing &mdash; documented by named Capterra reviewers</div>
+</div>
+
+<!-- ── PANEL: PAIN (quotes) ── -->
+<div class="panel" id="panel-pain">
+  <div id="quote-raven" class="quote-card">
+    <div class="quote-card-text">&ldquo;my price went up x5 (literally my price went up that much without exaggeration)&rdquo;</div>
+    <div class="quote-card-attribution">Raven T. &mdash; Capterra, August 8, 2024 &mdash; craftybase.com (now stocksmith.io)</div>
+  </div>
+  <div style="height:28px"></div>
+  <div id="quote-liza" class="quote-card">
+    <div class="quote-card-text">&ldquo;Having materials automatically deduct when I sell a product is very basic functionality that I should not have to pay $1,000 / year to have&rdquo;</div>
+    <div class="quote-card-attribution">Liza K. &mdash; Capterra, September 19, 2025</div>
+  </div>
+</div>
+
+<!-- ── PANEL: PRODUCT ── -->
+<div class="panel" id="panel-product">
+  <!-- Left: recipe card -->
+  <div class="product-col">
+    <div class="label-sm" style="margin-bottom:8px">Recipe</div>
+    <div id="recipe-card">
+      <div class="recipe-card-header">
+        <div>
+          <div class="recipe-card-header-label">Product SKU</div>
+          <div class="recipe-card-header-name">Lavender Soy Candle</div>
+        </div>
+      </div>
+      <table class="recipe-table">
+        <tr>
+          <td class="td-bullet"><span class="recipe-bullet"></span></td>
+          <td class="td-mat">Soy wax</td>
+          <td class="td-qty">2.0 oz</td>
+          <td class="td-cost">$0.18/oz</td>
+          <td class="td-line">$0.36</td>
+        </tr>
+        <tr>
+          <td class="td-bullet"><span class="recipe-bullet"></span></td>
+          <td class="td-mat">Fragrance oil</td>
+          <td class="td-qty">0.5 oz</td>
+          <td class="td-cost">$1.20/oz</td>
+          <td class="td-line">$0.60</td>
+        </tr>
+        <tr>
+          <td class="td-bullet"><span class="recipe-bullet"></span></td>
+          <td class="td-mat">Glass container</td>
+          <td class="td-qty">1 ea</td>
+          <td class="td-cost">$2.40 ea</td>
+          <td class="td-line">$2.40</td>
+        </tr>
+        <tr>
+          <td class="td-bullet"><span class="recipe-bullet"></span></td>
+          <td class="td-mat">Cotton wick</td>
+          <td class="td-qty">1 ea</td>
+          <td class="td-cost">$0.12 ea</td>
+          <td class="td-line">$0.12</td>
+        </tr>
+      </table>
+      <div class="recipe-cogs-row">
+        <span class="recipe-cogs-label">COGS per unit</span>
+        <span class="recipe-cogs-value">$3.48</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: order flow -->
+  <div class="product-col" style="padding-top:30px">
+    <div id="order-event">
+      <div class="order-event-dot"></div>
+      <div>
+        <div class="order-event-text">Etsy order #8841 received &mdash; Lavender Soy Candle &times;2</div>
+        <div class="order-event-meta">14:31:02 UTC &bull; webhook receipt/create</div>
+      </div>
+    </div>
+
+    <div id="deduct-result">
+      <div class="deduct-header">Materials deducted automatically</div>
+      <div class="deduct-row">
+        <span class="deduct-mat">Soy wax</span>
+        <span>
+          <span class="deduct-before">48.0 oz</span>
+          <span class="deduct-arrow-sm">&#8594;</span>
+          <span class="deduct-after">44.0 oz</span>
+        </span>
+        <span class="deduct-change">&minus;4.0 oz</span>
+      </div>
+      <div class="deduct-row">
+        <span class="deduct-mat">Fragrance oil</span>
+        <span>
+          <span class="deduct-before">12.0 oz</span>
+          <span class="deduct-arrow-sm">&#8594;</span>
+          <span class="deduct-after">11.0 oz</span>
+        </span>
+        <span class="deduct-change">&minus;1.0 oz</span>
+      </div>
+      <div class="deduct-row">
+        <span class="deduct-mat">Glass container</span>
+        <span>
+          <span class="deduct-before">24 ea</span>
+          <span class="deduct-arrow-sm">&#8594;</span>
+          <span class="deduct-after">22 ea</span>
+        </span>
+        <span class="deduct-change">&minus;2 ea</span>
+      </div>
+      <div class="deduct-row">
+        <span class="deduct-mat">Cotton wick</span>
+        <span>
+          <span class="deduct-before">24 ea</span>
+          <span class="deduct-arrow-sm">&#8594;</span>
+          <span class="deduct-after">22 ea</span>
+        </span>
+        <span class="deduct-change">&minus;2 ea</span>
+      </div>
+    </div>
+
+    <div id="cogs-result">
+      <span class="cogs-result-label">COGS this order (2 units)</span>
+      <span class="cogs-result-value">$6.96</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── PANEL: RELIABILITY ── -->
+<div class="panel" id="panel-reliability">
+  <div id="reliability-heading">Every deduction is logged. Nothing deducts twice.</div>
+
+  <div class="audit-log">
+    <div class="audit-log-header">
+      <span>Order</span>
+      <span>Received</span>
+      <span>Result</span>
+      <span>Note</span>
+    </div>
+    <div class="audit-log-row" id="log-line-1">
+      <span class="audit-col-order">#8841</span>
+      <span class="audit-col-time">14:31:02 UTC</span>
+      <span class="audit-col-status status-ok">&#10003; Deducted</span>
+      <span class="audit-col-note note-ok">4 materials updated &bull; key: a3f9</span>
+    </div>
+    <div class="audit-log-row" id="log-line-2">
+      <span class="audit-col-order">#8841</span>
+      <span class="audit-col-time">14:31:04 UTC</span>
+      <span class="audit-col-status status-blocked">&#8856; Duplicate</span>
+      <span class="audit-col-note note-blocked">key a3f9 already recorded &bull; no action</span>
+    </div>
+  </div>
+
+  <div id="blocked-badge">
+    <div class="blocked-badge-icon">&#8856;</div>
+    <div class="blocked-badge-text">Duplicate order #8841 blocked &mdash; idempotency key a3f9 already recorded at 14:31:02 UTC. No materials changed.</div>
+  </div>
+</div>
+
+<!-- ── PANEL: PRICING ── -->
+<div class="panel" id="panel-pricing">
+  <div id="pricing-heading">The same feature. One-fifth the price.</div>
+
+  <div class="pricing-grid">
+    <!-- Header row -->
+    <div class="pgcell pgcell-head" style="background:#0D1E28;color:#7A9BAA;font-size:11px;letter-spacing:0.06em;text-transform:uppercase"></div>
+    <div class="pgcell pgcell-head highlight">BatchCOGS Pro</div>
+    <div class="pgcell pgcell-head" style="background:#0D1E28">Stocksmith Indie</div>
+    <!-- Row 1 -->
+    <div class="pgcell pgcell-feature">Auto material deduction</div>
+    <div class="pgcell pgcell-check">&#10003;</div>
+    <div class="pgcell pgcell-check">&#10003;</div>
+    <!-- Row 2 -->
+    <div class="pgcell pgcell-feature">Etsy + Shopify</div>
+    <div class="pgcell pgcell-check">&#10003;</div>
+    <div class="pgcell pgcell-check">&#10003;</div>
+    <!-- Row 3 -->
+    <div class="pgcell pgcell-feature">Recipe / BOM builder</div>
+    <div class="pgcell pgcell-check">&#10003;</div>
+    <div class="pgcell pgcell-check">&#10003;</div>
+    <!-- Row 4: monthly price -->
+    <div class="pgcell pgcell-feature">Monthly</div>
+    <div class="pgcell pgcell-val amber-val">$19</div>
+    <div class="pgcell pgcell-val muted-val">$83&ndash;99</div>
+    <!-- Row 5: annual price -->
+    <div class="pgcell pgcell-feature row-last">Annual</div>
+    <div class="pgcell pgcell-val amber-val row-last">$180</div>
+    <div class="pgcell pgcell-val muted-val row-last">$990</div>
+  </div>
+
+  <div class="pricing-note">Stocksmith pricing: stocksmith.io/pricing &bull; BatchCOGS pricing: batchcogs.com</div>
+</div>
+
+<!-- ── PANEL: CLOSE ── -->
+<div class="panel" id="panel-close">
+  <div id="close-logo-wrap">
+    <!-- Dark variant logo at 2.5x scale -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" width="384" height="88" role="img" aria-label="BatchCOGS wordmark">
+      <title>BatchCOGS</title>
+      <rect x="7" y="7" width="29" height="33" rx="2" fill="#F0F3F5" opacity="0.28"/>
+      <rect x="3" y="3" width="29" height="33" rx="2" fill="#F0F3F5"/>
+      <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+      <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+      <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+      <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+      <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+      <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#1C3D52" opacity="0.50"/>
+      <text y="30" font-family="'DM Sans','Gill Sans MT','Century Gothic',system-ui,sans-serif" font-size="21.5" letter-spacing="-0.2">
+        <tspan x="46" font-weight="600" fill="#F0F3F5">Batch</tspan><tspan font-weight="300" fill="#F0F3F5" letter-spacing="1.2">COGS</tspan>
+      </text>
+    </svg>
+  </div>
+  <div id="close-url">batchcogs.com</div>
+  <div id="close-tagline">Recipe-based COGS tracking for handmade sellers &mdash; $19/month</div>
+</div>
+
+<!-- ── Caption bar ── -->
+<div id="caption-bar">
+  <div id="caption-text"></div>
+</div>
+
+<script>
+// ── Utilities ──────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
+
+function sceneFade(t, s, e, fi, fo) {
+  fi = fi === undefined ? 0.4 : fi;
+  fo = fo === undefined ? 0.4 : fo;
+  if (t <= s)      return 0;
+  if (t <= s + fi) return (t - s) / fi;
+  if (t <= e - fo) return 1;
+  if (t <= e)      return (e - t) / fo;
+  return 0;
+}
+
+function thresh(t, tShow, dur) {
+  dur = dur === undefined ? 0.35 : dur;
+  return clamp((t - tShow) / dur, 0, 1);
+}
+
+// ── Caption data ───────────────────────────────────────────────────────────
+var CAPTIONS = [
+  { s:  0, e:  4, text: 'In July 2026, Craftybase became Stocksmith.' },
+  { s:  4, e:  8, text: 'The price for automatic material deduction jumped to $83/month.' },
+  { s:  8, e: 13, text: 'Capterra reviewer Raven T.: “my price went up five times.”' },
+  { s: 13, e: 18, text: 'Liza K.: “basic functionality should not cost $1,000 a year.”' },
+  { s: 18, e: 22, text: 'BatchCOGS does the same job for $19 a month.' },
+  { s: 22, e: 27, text: 'Build a recipe once. Every order deducts your materials.' },
+  { s: 27, e: 32, text: 'Every deduction is logged with an idempotency key.' },
+  { s: 32, e: 38, text: 'Nothing deducts twice.' },
+  { s: 38, e: 43, text: 'BatchCOGS Pro: $19/month. Stocksmith Indie: $990/year.' },
+  { s: 43, e: 45, text: 'batchcogs.com' },
+];
+
+// ── Panel and sub-element references ──────────────────────────────────────
+var pHook        = document.getElementById('panel-hook');
+var pPain        = document.getElementById('panel-pain');
+var pProduct     = document.getElementById('panel-product');
+var pReliability = document.getElementById('panel-reliability');
+var pPricing     = document.getElementById('panel-pricing');
+var pClose       = document.getElementById('panel-close');
+
+var elOrderEvent  = document.getElementById('order-event');
+var elDeductResult= document.getElementById('deduct-result');
+var elCogsResult  = document.getElementById('cogs-result');
+var elLogLine1    = document.getElementById('log-line-1');
+var elLogLine2    = document.getElementById('log-line-2');
+var elBlockedBadge= document.getElementById('blocked-badge');
+
+var elCaption = document.getElementById('caption-text');
+
+// ── Pain panel: split quote visibility by sub-scene ───────────────────────
+var elQuoteRaven = document.getElementById('quote-raven');
+var elQuoteLiza  = document.getElementById('quote-liza');
+
+// ── window.seek — pure function of t ──────────────────────────────────────
+window.seek = function(t) {
+  // 1. Panel opacities
+  pHook.style.opacity        = sceneFade(t,  0,  8.5, 0.3, 0.4);
+  pPain.style.opacity        = sceneFade(t,  8, 18.5, 0.4, 0.4);
+  pProduct.style.opacity     = sceneFade(t, 18, 32.5, 0.4, 0.4);
+  pReliability.style.opacity = sceneFade(t, 32, 38.5, 0.4, 0.4);
+  pPricing.style.opacity     = sceneFade(t, 38, 43.5, 0.4, 0.4);
+  pClose.style.opacity       = sceneFade(t, 43, 46,   0.5, 0);
+
+  // 2. Pain panel: first quote visible from t=8, second from t=13
+  elQuoteRaven.style.opacity = thresh(t, 8.2);
+  elQuoteLiza.style.opacity  = thresh(t, 13.2);
+
+  // 3. Product panel sub-elements
+  elOrderEvent.style.opacity   = thresh(t, 22.3);
+  elDeductResult.style.opacity = thresh(t, 25.2);
+  elCogsResult.style.opacity   = thresh(t, 28.8);
+
+  // 4. Reliability sub-elements
+  elLogLine1.style.opacity     = thresh(t, 32.8);
+  elLogLine2.style.opacity     = thresh(t, 35.0);
+  elBlockedBadge.style.opacity = thresh(t, 35.5);
+
+  // 5. Caption
+  var text = '';
+  for (var i = 0; i < CAPTIONS.length; i++) {
+    var c = CAPTIONS[i];
+    if (t >= c.s && t < c.e) { text = c.text; break; }
+  }
+  elCaption.textContent = text;
+};
+
+// Initialise at t=0
+window.seek(0);
+</script>
+</body>
+</html>

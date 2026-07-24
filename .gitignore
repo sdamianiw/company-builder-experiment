@@ -1,3 +1,6 @@
 run-1/tools/node_modules/
 run-1/tools/smoke*
 run-1/tools/smokeframes/
+run-1/video/frames/
+run-1/video/check-*.png
+run-1/video/*.wav
