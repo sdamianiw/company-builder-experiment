@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BatchCOGS — interactive demo</title>
+  <meta name="description" content="Try BatchCOGS in your browser. Recipe-based COGS tracking and inventory deduction for handmade sellers — runs entirely in localStorage, no account needed.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+/* ================================================================
+   BatchCOGS demo.html — self-contained styles
+   styles.css inlined + demo-specific additions
+   ================================================================ */
+
+/* --- DESIGN TOKENS -------------------------------------------- */
+:root {
+  --color-ink:        #1C3D52;
+  --color-amber:      #D4911F;
+  --color-fog:        #F0F3F5;
+  --color-void:       #0D1E28;
+  --color-slate:      #7A9BAA;
+  --color-paper:      #E4EBF0;
+  --color-ink-card:   #162A38;
+  --color-ink-border: #24404F;
+  --color-success:    #2A7A4A;
+  --color-error:      #A0291E;
+
+  --sp-1:  4px;  --sp-2:  8px;  --sp-3:  12px; --sp-4:  16px;
+  --sp-5:  20px; --sp-6:  24px; --sp-8:  32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px;
+
+  --font-display: 'DM Serif Display', 'Georgia', serif;
+  --font-body:    'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+
+  --container-max: 1200px;
+  --container-pad: clamp(20px, 5vw, 48px);
+  --section-pad:   64px;
+  --nav-height:    64px;
+}
+@media (max-width: 600px) { :root { --section-pad: 48px; } }
+
+/* --- RESET ---------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  background-color: var(--color-fog);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: var(--color-ink); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--color-ink); text-decoration-color: var(--color-amber); }
+a:focus-visible { outline: 2px solid var(--color-amber); outline-offset: 3px; border-radius: 1px; }
+ul, ol { list-style: none; }
+button { background: none; border: none; cursor: pointer; font-family: inherit; }
+
+/* --- TYPOGRAPHY ----------------------------------------------- */
+.t-display { font-family: var(--font-display); font-size: 3rem; font-weight: 400; line-height: 1.10; letter-spacing: -0.02em; text-wrap: balance; }
+.t-h1  { font-family: var(--font-display); font-size: 2.25rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance; }
+.t-h2  { font-family: var(--font-display); font-size: 1.625rem; font-weight: 400; line-height: 1.25; letter-spacing: -0.01em; text-wrap: balance; }
+.t-h3  { font-family: var(--font-body); font-size: 1.125rem; font-weight: 600; line-height: 1.35; letter-spacing: -0.005em; text-wrap: balance; }
+.t-body-lg { font-family: var(--font-body); font-size: 1.0625rem; font-weight: 400; line-height: 1.65; }
+.t-body    { font-family: var(--font-body); font-size: 1rem; font-weight: 400; line-height: 1.6; }
+.t-body-sm { font-family: var(--font-body); font-size: 0.875rem; font-weight: 400; line-height: 1.55; }
+.t-label   { font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; line-height: 1.4; letter-spacing: 0.06em; }
+.t-caption { font-family: var(--font-body); font-size: 0.6875rem; font-weight: 400; line-height: 1.45; letter-spacing: 0.04em; }
+.t-mono    { font-family: var(--font-mono); font-size: 0.875rem; font-weight: 400; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.t-mono-lg { font-family: var(--font-mono); font-size: 1.125rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
+
+/* --- LAYOUT --------------------------------------------------- */
+.container { max-width: var(--container-max); margin-inline: auto; padding-inline: var(--container-pad); }
+.section { padding-block: var(--section-pad); background-color: var(--color-fog); }
+.section--paper { background-color: var(--color-paper); }
+.section--dark  { background-color: var(--color-void); color: var(--color-fog); }
+.section--dark .t-h2, .section--dark .t-h1, .section--dark .t-display { color: var(--color-fog); }
+.section--dark p, .section--dark li { color: var(--color-fog); }
+.section--dark a { color: var(--color-fog); }
+.text-slate { color: var(--color-slate); }
+.section-label { display: block; font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; color: var(--color-slate); margin-bottom: var(--sp-2); }
+
+/* --- NAV ------------------------------------------------------ */
+.site-header { position: sticky; top: 0; z-index: 100; background-color: var(--color-fog); border-bottom: 1px solid var(--color-paper); }
+.site-header__inner { display: flex; align-items: center; justify-content: space-between; height: var(--nav-height); max-width: var(--container-max); margin-inline: auto; padding-inline: var(--container-pad); gap: var(--sp-4); }
+.site-header__logo { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; }
+.site-header__logo svg { width: 140px; height: auto; }
+.nav-list { display: none; flex-direction: row; align-items: center; gap: var(--sp-2); }
+.nav-link { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; color: var(--color-slate); text-decoration: none; padding: var(--sp-2) var(--sp-3); border-radius: 1px; transition: color 0.15s ease; }
+.nav-link:hover, .nav-link.is-current { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-amber); text-underline-offset: 3px; }
+.nav-link:focus-visible { outline: 2px solid var(--color-amber); outline-offset: 3px; }
+.nav-cta { display: none; flex-shrink: 0; }
+.nav-toggle { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: var(--sp-10); height: var(--sp-10); padding: var(--sp-2); flex-shrink: 0; }
+.nav-toggle span { display: block; height: 1.5px; background-color: var(--color-ink); transition: transform 0.2s ease, opacity 0.2s ease; transform-origin: center; }
+.nav-open .nav-list { display: flex; flex-direction: column; position: absolute; top: var(--nav-height); left: 0; right: 0; background-color: var(--color-fog); border-bottom: 1px solid var(--color-paper); padding: var(--sp-4) var(--container-pad); gap: var(--sp-2); align-items: flex-start; }
+.nav-open .nav-list li { width: 100%; }
+.nav-open .nav-link { display: block; padding: var(--sp-3) 0; font-size: 0.875rem; border-bottom: 1px solid var(--color-paper); }
+.nav-open .nav-toggle span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-open .nav-toggle span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+@media (min-width: 768px) {
+  .nav-list { display: flex; }
+  .nav-cta  { display: inline-flex; }
+  .nav-toggle { display: none; }
+}
+
+/* --- BUTTONS -------------------------------------------------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-body); font-size: 0.875rem; font-weight: 500; letter-spacing: 0.01em; line-height: 1; padding: 10px 22px; text-decoration: none; border: 1.5px solid transparent; border-radius: 2px; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; white-space: nowrap; }
+.btn:focus-visible { outline: 2px solid var(--color-amber); outline-offset: 3px; }
+.btn--primary { background-color: var(--color-ink); border-color: var(--color-ink); color: var(--color-fog); }
+.btn--primary:hover { background-color: var(--color-ink-border); border-color: var(--color-ink-border); color: var(--color-fog); text-decoration: none; }
+.btn--outline { background-color: transparent; border-color: var(--color-amber); color: var(--color-ink); }
+.btn--outline:hover { background-color: var(--color-paper); color: var(--color-ink); text-decoration: none; }
+.btn--ghost { background-color: transparent; border-color: var(--color-slate); color: var(--color-ink); }
+.btn--ghost:hover { background-color: var(--color-paper); color: var(--color-ink); text-decoration: none; }
+.btn--full { width: 100%; }
+.btn--sm { font-size: 0.8125rem; padding: 7px 14px; }
+.btn--danger { background-color: transparent; border-color: var(--color-error); color: var(--color-error); }
+.btn--danger:hover { background-color: rgba(160, 41, 30, 0.07); text-decoration: none; }
+
+/* --- CARDS ---------------------------------------------------- */
+.card { background-color: var(--color-paper); border: 1px solid var(--color-paper); border-radius: var(--sp-1); padding: var(--sp-6); }
+
+/* --- TABLES --------------------------------------------------- */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--color-paper); border-radius: var(--sp-1); }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.data-table th { font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; color: var(--color-slate); text-align: left; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-paper); background-color: var(--color-fog); white-space: nowrap; }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-paper); vertical-align: middle; color: var(--color-ink); line-height: 1.5; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background-color: rgba(228,235,240,0.5); }
+.td-mono { font-family: var(--font-mono); font-size: 0.8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* --- FOOTER --------------------------------------------------- */
+.site-footer { background-color: var(--color-void); color: var(--color-fog); padding-block: var(--sp-12); }
+.site-footer__inner { max-width: var(--container-max); margin-inline: auto; padding-inline: var(--container-pad); display: flex; flex-direction: column; gap: var(--sp-8); }
+@media (min-width: 768px) { .site-footer__inner { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: var(--sp-10); } }
+.site-footer__logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
+.site-footer__logo svg { width: 130px; height: auto; }
+.site-footer__nav { display: flex; flex-direction: column; gap: var(--sp-3); }
+@media (min-width: 768px) { .site-footer__nav { flex-direction: row; gap: var(--sp-5); align-items: center; flex-wrap: wrap; } }
+.footer-link { font-size: 0.8125rem; font-weight: 400; color: var(--color-slate); text-decoration: none; transition: color 0.15s ease; letter-spacing: 0.02em; }
+.footer-link:hover { color: var(--color-fog); text-decoration: none; }
+.site-footer__copy { color: var(--color-slate); }
+@media (min-width: 768px) { .site-footer__copy { text-align: right; flex-shrink: 0; } }
+.site-footer__copy a { color: var(--color-slate); }
+.site-footer__copy a:hover { color: var(--color-fog); text-decoration: none; }
+
+/* --- REDUCED MOTION ------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ================================================================
+   DEMO-SPECIFIC STYLES
+   ================================================================ */
+
+/* --- Demo banner ---------------------------------------------- */
+.demo-banner {
+  background-color: var(--color-paper);
+  border-bottom: 2px solid var(--color-amber);
+  padding: 10px 0;
+}
+.demo-banner__inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+.demo-banner p {
+  font-size: 0.8125rem;
+  color: var(--color-slate);
+  line-height: 1.45;
+}
+.demo-banner strong { color: var(--color-ink); font-weight: 500; }
+
+/* --- Stats bar ------------------------------------------------ */
+.stats-bar {
+  background-color: var(--color-paper);
+  border-bottom: 1px solid rgba(122,155,170,0.2);
+  padding: var(--sp-5) 0;
+}
+.stats-bar__inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+.stats-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-6);
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.375rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+  line-height: 1;
+}
+.stat-value--warn { color: var(--color-amber); }
+.stat-value--block { color: var(--color-success); }
+.stat-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-slate);
+}
+.global-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+
+/* --- Tab navigation ------------------------------------------- */
+.tab-nav-wrap {
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 50;
+  background-color: var(--color-fog);
+  border-bottom: 1px solid var(--color-paper);
+}
+.tab-nav {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--color-slate);
+  padding: var(--sp-4) var(--sp-5);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--color-ink); }
+.tab-btn.is-active { color: var(--color-ink); border-bottom-color: var(--color-amber); }
+.tab-btn:focus-visible { outline: 2px solid var(--color-amber); outline-offset: -2px; }
+
+/* --- Tab panels ----------------------------------------------- */
+.tab-section { padding-block: var(--sp-8); }
+.tab-panel { display: none; }
+.tab-panel.is-active { display: block; }
+
+/* --- Panel header --------------------------------------------- */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+.panel-header h2 { margin: 0; }
+
+/* --- Badges --------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 2px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.badge--low  { background: rgba(212,145,31,0.14); color: #8B5E10; border: 1px solid rgba(212,145,31,0.35); }
+.badge--sale { background: rgba(42,122,74,0.11);  color: #1D6037; border: 1px solid rgba(42,122,74,0.28); }
+.badge--block{ background: rgba(212,145,31,0.14); color: #8B5E10; border: 1px solid rgba(212,145,31,0.35); }
+.badge--meta { background: rgba(122,155,170,0.14);color: #4E7585; border: 1px solid rgba(122,155,170,0.28); }
+.badge--warn { background: rgba(160,41,30,0.10);  color: #7A2018; border: 1px solid rgba(160,41,30,0.25); }
+
+/* --- Row actions ---------------------------------------------- */
+.row-actions { display: flex; gap: var(--sp-2); align-items: center; flex-wrap: nowrap; }
+.action-link {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-slate);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+.action-link:hover { color: var(--color-ink); }
+.action-link--danger:hover { color: var(--color-error); }
+.action-sep { color: var(--color-paper); font-size: 0.75rem; }
+
+/* Confirm-delete inline row */
+.confirm-row td { background: rgba(160,41,30,0.05); }
+.confirm-row-inner { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.confirm-row-inner span { font-size: 0.875rem; color: var(--color-error); }
+
+/* Expandable recipe row */
+.recipe-expand-row td { background-color: var(--color-paper); padding: var(--sp-4) var(--sp-4); }
+.recipe-detail-table { width: auto; min-width: 360px; border-collapse: collapse; }
+.recipe-detail-table th { font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.06em; color: var(--color-slate); text-align: left; padding: var(--sp-1) var(--sp-3) var(--sp-1) 0; border-bottom: 1px solid rgba(122,155,170,0.2); }
+.recipe-detail-table td { font-size: 0.8125rem; padding: var(--sp-2) var(--sp-3) var(--sp-2) 0; border-bottom: 1px solid rgba(228,235,240,0.7); color: var(--color-ink); vertical-align: top; }
+.recipe-detail-table tbody tr:last-child td { border-bottom: none; }
+.recipe-total-row td { font-family: var(--font-mono); font-weight: 500; border-top: 1px solid rgba(122,155,170,0.3); border-bottom: none; padding-top: var(--sp-3); }
+
+/* Missing material warning in table */
+.missing-material { color: var(--color-error); font-size: 0.75rem; font-style: italic; }
+
+/* --- Forms ---------------------------------------------------- */
+.form-group { display: flex; flex-direction: column; gap: var(--sp-2); margin-bottom: var(--sp-4); }
+.form-label { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; color: var(--color-ink); }
+.form-hint  { font-size: 0.75rem; color: var(--color-slate); line-height: 1.4; }
+.form-error { font-size: 0.75rem; color: var(--color-error); }
+
+.form-input,
+.form-select {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--color-ink);
+  background-color: var(--color-fog);
+  border: 1.5px solid rgba(122,155,170,0.4);
+  border-radius: 2px;
+  padding: 9px 12px;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: 1.4;
+}
+.form-input:focus,
+.form-select:focus { border-color: var(--color-ink); box-shadow: 0 0 0 2px rgba(28,61,82,0.1); }
+.form-input.is-error,
+.form-select.is-error { border-color: var(--color-error); }
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%237A9BAA' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 34px;
+  cursor: pointer;
+}
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+@media (max-width: 480px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+/* --- Record a sale -------------------------------------------- */
+.sale-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  align-items: start;
+}
+@media (min-width: 768px) { .sale-layout { grid-template-columns: 420px 1fr; } }
+
+.sale-form-card { background: var(--color-fog); border: 1px solid var(--color-paper); border-radius: 2px; padding: var(--sp-6); }
+.sale-form-card h3 { margin-bottom: var(--sp-5); }
+
+.live-preview {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--color-paper);
+  border-radius: 2px;
+  font-size: 0.8125rem;
+  color: var(--color-slate);
+  line-height: 1.55;
+  display: none;
+}
+.live-preview.is-visible { display: block; }
+.live-preview strong { color: var(--color-ink); font-family: var(--font-mono); font-size: 0.8125rem; }
+
+/* Idempotency callout */
+.idempotency-card {
+  border-left: 3px solid var(--color-amber);
+  padding: var(--sp-5) var(--sp-5) var(--sp-5) var(--sp-4);
+  background: var(--color-paper);
+  border-radius: 0 2px 2px 0;
+  margin-bottom: var(--sp-4);
+}
+.idempotency-card h3 { margin-bottom: var(--sp-3); font-size: 1rem; }
+.idempotency-card p { font-size: 0.875rem; color: var(--color-ink); line-height: 1.6; margin-bottom: var(--sp-2); }
+.idempotency-card p:last-child { margin-bottom: 0; color: var(--color-slate); font-size: 0.8125rem; }
+
+/* Sale result */
+.sale-result {
+  border-radius: 2px;
+  padding: var(--sp-4) var(--sp-5);
+  margin-top: var(--sp-4);
+  display: none;
+}
+.sale-result.is-visible { display: block; }
+.sale-result--success { background: rgba(42,122,74,0.08); border: 1px solid rgba(42,122,74,0.28); }
+.sale-result--blocked  { background: rgba(212,145,31,0.09); border: 1px solid rgba(212,145,31,0.35); }
+.sale-result__title { font-weight: 600; font-size: 0.9375rem; margin-bottom: var(--sp-2); }
+.sale-result--success .sale-result__title { color: var(--color-success); }
+.sale-result--blocked  .sale-result__title { color: #8B5E10; }
+.sale-result__body { font-size: 0.875rem; color: var(--color-ink); line-height: 1.6; }
+.sale-result__body .mono { font-family: var(--font-mono); font-size: 0.8125rem; }
+.sale-result__cta {
+  display: inline-flex;
+  margin-top: var(--sp-3);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  padding: 0;
+  gap: var(--sp-1);
+  align-items: center;
+}
+.sale-result__cta:hover { color: var(--color-amber); text-decoration: none; }
+.sale-result__cta--green { color: var(--color-success); }
+
+/* Repeat-sale hint */
+.repeat-hint {
+  display: none;
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(212,145,31,0.08);
+  border: 1px dashed rgba(212,145,31,0.4);
+  border-radius: 2px;
+  font-size: 0.8125rem;
+  color: #8B5E10;
+  line-height: 1.55;
+}
+.repeat-hint.is-visible { display: block; }
+
+/* --- Audit trail --------------------------------------------- */
+.audit-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+.audit-list {
+  border: 1px solid var(--color-paper);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.audit-entry {
+  display: grid;
+  grid-template-columns: 90px auto 1fr;
+  gap: var(--sp-4);
+  align-items: start;
+  padding: var(--sp-4);
+  border-bottom: 1px solid var(--color-paper);
+  background-color: var(--color-fog);
+}
+.audit-entry:last-child { border-bottom: none; }
+.audit-entry--blocked { background: rgba(212,145,31,0.05); }
+.audit-ts { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-slate); white-space: nowrap; padding-top: 2px; line-height: 1.5; }
+.audit-desc { font-size: 0.875rem; color: var(--color-ink); line-height: 1.55; }
+@media (max-width: 520px) {
+  .audit-entry { grid-template-columns: 1fr; gap: var(--sp-2); }
+  .audit-ts { font-size: 0.6875rem; }
+}
+.empty-state { text-align: center; padding: var(--sp-10) var(--sp-6); color: var(--color-slate); }
+.empty-state p { font-size: 0.875rem; max-width: 38ch; margin-inline: auto; }
+
+/* --- Modal ---------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,30,40,0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 200;
+  padding: var(--sp-8) var(--sp-4) var(--sp-8);
+  overflow-y: auto;
+}
+.modal-overlay[hidden] { display: none; }
+.modal {
+  background: var(--color-fog);
+  border-radius: 2px;
+  width: 100%;
+  max-width: 520px;
+  padding: var(--sp-8);
+  position: relative;
+}
+.modal--wide { max-width: 640px; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-6); gap: var(--sp-4); }
+.modal-header h3 { font-size: 1.125rem; font-weight: 600; color: var(--color-ink); }
+.modal-close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: var(--color-slate); font-size: 1.25rem; line-height: 1; flex-shrink: 0; border-radius: 2px; transition: color 0.15s, background 0.15s; }
+.modal-close:hover { color: var(--color-ink); background: var(--color-paper); }
+.modal-close:focus-visible { outline: 2px solid var(--color-amber); outline-offset: 2px; }
+.modal-footer { display: flex; gap: var(--sp-3); justify-content: flex-end; margin-top: var(--sp-6); padding-top: var(--sp-5); border-top: 1px solid var(--color-paper); flex-wrap: wrap; }
+
+/* --- Recipe builder ------------------------------------------- */
+.recipe-builder-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-3); padding-top: var(--sp-4); border-top: 1px solid var(--color-paper); }
+.recipe-builder-header .t-label { color: var(--color-slate); }
+.recipe-row { display: grid; grid-template-columns: 1fr 88px 34px; gap: var(--sp-2); align-items: start; margin-bottom: var(--sp-2); }
+.recipe-row .form-input,
+.recipe-row .form-select { margin-bottom: 0; }
+.recipe-remove {
+  width: 34px; height: 38px; display: flex; align-items: center; justify-content: center;
+  color: var(--color-slate); border: 1.5px solid rgba(122,155,170,0.4); border-radius: 2px;
+  font-size: 1.1rem; transition: color 0.15s, border-color 0.15s;
+}
+.recipe-remove:hover { color: var(--color-error); border-color: var(--color-error); }
+.cogs-preview {
+  margin-top: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-slate);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--color-paper);
+  border-radius: 2px;
+}
+.cogs-preview strong { color: var(--color-ink); }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════ NAV ════════════════════════════ -->
+<header class="site-header" id="site-header">
+  <div class="site-header__inner">
+    <a href="index.html" class="site-header__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#1C3D52" opacity="0.30"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#1C3D52"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#F0F3F5" opacity="0.88"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#F0F3F5" opacity="0.60"/>
+        <text y="30" font-family="'DM Sans','Gill Sans MT','Century Gothic',system-ui,sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#1C3D52">Batch</tspan><tspan font-weight="300" fill="#1C3D52" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+    <nav aria-label="Main navigation">
+      <ul class="nav-list" id="nav-list">
+        <li><a href="demo.html"    class="nav-link is-current">Try the demo</a></li>
+        <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+        <li><a href="compare.html" class="nav-link">Compare</a></li>
+        <li><a href="switch.html"  class="nav-link">Switch from Stocksmith</a></li>
+      </ul>
+    </nav>
+    <a href="demo.html" class="btn btn--outline nav-cta">Try the demo</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-list">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ═════════════════════════ DEMO BANNER ════════════════════════ -->
+<div class="demo-banner" role="banner" aria-label="Demo notice">
+  <div class="demo-banner__inner">
+    <p><strong>Browser-only demo.</strong> All data lives in your browser's localStorage — nothing is sent to any server. Data persists across page reloads until you click "Reset demo data."</p>
+  </div>
+</div>
+
+<!-- ════════════════════════ STATS BAR ═══════════════════════════ -->
+<div class="stats-bar">
+  <div class="stats-bar__inner">
+    <div class="stats-group">
+      <div class="stat-item">
+        <span class="stat-value" id="stat-products">—</span>
+        <span class="stat-label">products</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-materials">—</span>
+        <span class="stat-label">materials</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value stat-value--warn" id="stat-lowstock">—</span>
+        <span class="stat-label">low stock</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-orders">—</span>
+        <span class="stat-label">orders recorded</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value stat-value--block" id="stat-blocked">—</span>
+        <span class="stat-label">duplicates blocked</span>
+      </div>
+    </div>
+    <div class="global-actions">
+      <button class="btn btn--ghost btn--sm" id="btn-export-csv">Export audit log CSV</button>
+      <button class="btn btn--ghost btn--sm" id="btn-reset">Reset demo data</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ TAB NAV ═════════════════════════════ -->
+<div class="tab-nav-wrap">
+  <div class="tab-nav" role="tablist" aria-label="Demo sections">
+    <button class="tab-btn is-active" data-tab="materials" role="tab" aria-selected="true"  aria-controls="panel-materials">Materials</button>
+    <button class="tab-btn"           data-tab="products"  role="tab" aria-selected="false" aria-controls="panel-products">Products</button>
+    <button class="tab-btn"           data-tab="record"    role="tab" aria-selected="false" aria-controls="panel-record">Record a sale</button>
+    <button class="tab-btn"           data-tab="audit"     role="tab" aria-selected="false" aria-controls="panel-audit">Audit trail</button>
+  </div>
+</div>
+
+<!-- ════════════════════════ TAB CONTENT ═════════════════════════ -->
+<section class="tab-section">
+  <div class="container">
+
+    <!-- MATERIALS PANEL -->
+    <div id="panel-materials" class="tab-panel is-active" role="tabpanel" aria-labelledby="">
+      <div class="panel-header">
+        <h2 class="t-h2">Materials library</h2>
+        <button class="btn btn--primary btn--sm" id="btn-add-material">Add material</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="materials-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Unit</th>
+              <th>Cost per unit</th>
+              <th>Stock on hand</th>
+              <th>Low-stock threshold</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="materials-tbody">
+            <!-- rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRODUCTS PANEL -->
+    <div id="panel-products" class="tab-panel" role="tabpanel">
+      <div class="panel-header">
+        <h2 class="t-h2">Products and recipes</h2>
+        <button class="btn btn--primary btn--sm" id="btn-add-product">Add product</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="products-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Sale price</th>
+              <th>COGS</th>
+              <th>Gross margin</th>
+              <th>Recipe</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody">
+            <!-- rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECORD A SALE PANEL -->
+    <div id="panel-record" class="tab-panel" role="tabpanel">
+      <div class="panel-header">
+        <h2 class="t-h2">Record a sale</h2>
+      </div>
+      <div class="sale-layout">
+
+        <!-- LEFT: form -->
+        <div class="sale-form-card">
+          <h3 class="t-h3">Sale details</h3>
+          <form id="form-sale" novalidate>
+
+            <div class="form-group">
+              <label class="form-label" for="sale-order-id">Order ID</label>
+              <input class="form-input" type="text" id="sale-order-id" placeholder="e.g. ETY-2026-001" autocomplete="off" spellcheck="false">
+              <p class="form-hint" id="sale-order-hint">Each order ID is used as an idempotency key. Submitting the same ID twice blocks the second deduction.</p>
+              <p class="form-error" id="sale-order-error" hidden></p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sale-product">Product</label>
+              <select class="form-select" id="sale-product">
+                <option value="">Select a product</option>
+              </select>
+              <p class="form-error" id="sale-product-error" hidden></p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sale-qty">Quantity sold</label>
+              <input class="form-input" type="number" id="sale-qty" min="1" step="1" value="1">
+              <p class="form-hint">Materials deduct proportionally. Qty 2 deducts 2× each ingredient.</p>
+              <p class="form-error" id="sale-qty-error" hidden></p>
+            </div>
+
+            <div class="live-preview" id="sale-preview">
+              <!-- updated by JS -->
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--full" style="margin-top:var(--sp-2)">Record sale</button>
+          </form>
+
+          <div class="sale-result" id="sale-result">
+            <!-- updated by JS -->
+          </div>
+
+          <div class="repeat-hint" id="repeat-hint">
+            The order ID above is still set to the last recorded order. Submit again to see duplicate blocking.
+          </div>
+        </div>
+
+        <!-- RIGHT: idempotency explainer -->
+        <div>
+          <div class="idempotency-card">
+            <h3 class="t-h3">Every order gets an idempotency key</h3>
+            <p>When you record a sale, BatchCOGS checks the order ID against every previously recorded order before deducting a single unit of material. If the ID already exists, the deduction is blocked — stock does not change, and the block is written to the audit trail.</p>
+            <p>Try it: record a sale, then submit the exact same order ID again. The second submission returns a "duplicate blocked" result in under a millisecond, with a timestamp pointing to the original.</p>
+          </div>
+
+          <div id="sale-right-result">
+            <!-- Secondary result display for context — updated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIT TRAIL PANEL -->
+    <div id="panel-audit" class="tab-panel" role="tabpanel">
+      <div class="audit-toolbar">
+        <h2 class="t-h2">Audit trail</h2>
+        <button class="btn btn--ghost btn--sm" id="btn-export-audit">Export as CSV</button>
+      </div>
+      <p class="t-body-sm text-slate" style="margin-bottom:var(--sp-4)">Every material deduction, duplicate block, and data change is logged here with a timestamp. The log is append-only within this session.</p>
+      <div id="audit-container">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</section>
+
+<!-- ══════════════════════ MATERIAL MODAL ════════════════════════ -->
+<div id="modal-material" class="modal-overlay" hidden aria-modal="true" role="dialog" aria-labelledby="modal-material-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-material-title">Add material</h3>
+      <button class="modal-close" id="modal-material-close" aria-label="Close">&#x2715;</button>
+    </div>
+    <form id="form-material" novalidate>
+      <input type="hidden" id="mat-id">
+      <div class="form-group">
+        <label class="form-label" for="mat-name">Name</label>
+        <input class="form-input" type="text" id="mat-name" placeholder="e.g. Soy wax">
+        <p class="form-error" id="mat-name-error" hidden></p>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="mat-unit">Unit</label>
+          <input class="form-input" type="text" id="mat-unit" placeholder="e.g. lb, oz, unit">
+          <p class="form-error" id="mat-unit-error" hidden></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="mat-cost">Cost per unit ($)</label>
+          <input class="form-input" type="number" id="mat-cost" min="0.001" step="0.001" placeholder="0.00">
+          <p class="form-error" id="mat-cost-error" hidden></p>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="mat-stock">Stock on hand</label>
+          <input class="form-input" type="number" id="mat-stock" min="0" step="any" placeholder="0">
+          <p class="form-error" id="mat-stock-error" hidden></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="mat-threshold">Low-stock threshold</label>
+          <input class="form-input" type="number" id="mat-threshold" min="0.001" step="any" placeholder="0">
+          <p class="form-hint">Flag appears when stock falls below this level.</p>
+          <p class="form-error" id="mat-threshold-error" hidden></p>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn--ghost" id="modal-material-cancel">Cancel</button>
+      <button class="btn btn--primary" id="modal-material-save">Save material</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ PRODUCT MODAL ═════════════════════════ -->
+<div id="modal-product" class="modal-overlay" hidden aria-modal="true" role="dialog" aria-labelledby="modal-product-title">
+  <div class="modal modal--wide">
+    <div class="modal-header">
+      <h3 id="modal-product-title">Add product</h3>
+      <button class="modal-close" id="modal-product-close" aria-label="Close">&#x2715;</button>
+    </div>
+    <form id="form-product" novalidate>
+      <input type="hidden" id="prod-id">
+      <div class="form-row-2">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label" for="prod-name">Product name</label>
+          <input class="form-input" type="text" id="prod-name" placeholder="e.g. Lavender soy candle 8oz">
+          <p class="form-error" id="prod-name-error" hidden></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="prod-price">Sale price ($)</label>
+          <input class="form-input" type="number" id="prod-price" min="0.01" step="0.01" placeholder="0.00">
+          <p class="form-error" id="prod-price-error" hidden></p>
+        </div>
+      </div>
+
+      <!-- Recipe builder -->
+      <div class="recipe-builder-header">
+        <span class="t-label">Bill of materials (recipe)</span>
+        <button type="button" class="btn btn--ghost btn--sm" id="btn-add-recipe-row">+ Add ingredient</button>
+      </div>
+      <div id="recipe-rows">
+        <!-- populated by JS -->
+      </div>
+      <p class="form-error" id="prod-recipe-error" hidden></p>
+
+      <div class="cogs-preview" id="prod-cogs-preview" hidden>
+        COGS at current material costs: <strong id="prod-cogs-value">$0.00</strong>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn--ghost" id="modal-product-cancel">Cancel</button>
+      <button class="btn btn--primary" id="modal-product-save">Save product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ FOOTER ══════════════════════════════ -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <a href="index.html" class="site-footer__logo" aria-label="BatchCOGS home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 44" role="img" aria-label="BatchCOGS wordmark">
+        <title>BatchCOGS</title>
+        <rect x="7" y="7" width="29" height="33" rx="2" fill="#F0F3F5" opacity="0.28"/>
+        <rect x="3" y="3" width="29" height="33" rx="2" fill="#F0F3F5"/>
+        <rect x="8"  y="12" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="12.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+        <rect x="8"  y="19" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="19.5" width="14" height="2" rx="1" fill="#1C3D52" opacity="0.75"/>
+        <rect x="8"  y="26" width="3" height="3" rx="0.5" fill="#D4911F"/>
+        <rect x="14" y="26.5" width="8"  height="2" rx="1" fill="#1C3D52" opacity="0.50"/>
+        <text y="30" font-family="'DM Sans','Gill Sans MT','Century Gothic',system-ui,sans-serif" font-size="21.5" letter-spacing="-0.2">
+          <tspan x="46" font-weight="600" fill="#F0F3F5">Batch</tspan><tspan font-weight="300" fill="#F0F3F5" letter-spacing="1.2">COGS</tspan>
+        </text>
+      </svg>
+    </a>
+    <nav aria-label="Footer navigation" class="site-footer__nav">
+      <a href="demo.html"    class="footer-link">Try the demo</a>
+      <a href="pricing.html" class="footer-link">Pricing</a>
+      <a href="compare.html" class="footer-link">Compare</a>
+      <a href="switch.html"  class="footer-link">Switch from Stocksmith</a>
+    </nav>
+    <p class="t-caption site-footer__copy">
+      &copy; 2026 BatchCOGS &middot;
+      <a href="mailto:hello@batchcogs.com" class="footer-link">hello@batchcogs.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ================================================================
+   NAV TOGGLE (verbatim from index.html)
+   ================================================================ */
+(function () {
+  var header = document.getElementById('site-header');
+  var toggle = document.getElementById('nav-toggle');
+  if (!header || !toggle) return;
+  toggle.addEventListener('click', function () {
+    var isOpen = header.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    toggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && header.classList.contains('nav-open')) {
+      header.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open navigation');
+      toggle.focus();
+    }
+  });
+  document.querySelectorAll('.nav-link').forEach(function (link) {
+    link.addEventListener('click', function () {
+      header.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open navigation');
+    });
+  });
+}());
+
+/* ================================================================
+   BATCHCOGS DEMO APP
+   ================================================================ */
+(function () {
+  'use strict';
+
+  /* ── Storage keys ────────────────────────────────────────────── */
+  var SK = {
+    materials: 'bc_demo_materials',
+    products:  'bc_demo_products',
+    orders:    'bc_demo_orders',
+    audit:     'bc_demo_audit'
+  };
+
+  /* ── Utilities ───────────────────────────────────────────────── */
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function fmtCurrency(n) {
+    return '$' + Number(n).toFixed(2);
+  }
+
+  function fmtPct(n) {
+    return Number(n).toFixed(1) + '%';
+  }
+
+  function fmtTs(iso) {
+    var d = new Date(iso);
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
+  function fmtDate(iso) {
+    var d = new Date(iso);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getDate() + ', ' + fmtTs(iso);
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  function loadJson(key) {
+    try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; }
+  }
+
+  function saveJson(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+
+  /* ── Sample data ─────────────────────────────────────────────── */
+  var SAMPLE_MATERIALS = [
+    { id:'m1', name:'Soy wax',               unit:'lb',   costPerUnit:2.80, stock:15,  lowThreshold:5  },
+    { id:'m2', name:'Cotton wick',            unit:'unit', costPerUnit:0.13, stock:200, lowThreshold:50 },
+    { id:'m3', name:'8oz glass jar',          unit:'unit', costPerUnit:1.20, stock:48,  lowThreshold:12 },
+    { id:'m4', name:'Lavender fragrance oil', unit:'oz',   costPerUnit:1.80, stock:32,  lowThreshold:8  },
+    { id:'m5', name:'Vanilla fragrance oil',  unit:'oz',   costPerUnit:1.95, stock:28,  lowThreshold:8  },
+    { id:'m6', name:'Citrus fragrance oil',   unit:'oz',   costPerUnit:1.65, stock:5,   lowThreshold:8  },
+    { id:'m7', name:'Kraft box',              unit:'unit', costPerUnit:0.65, stock:60,  lowThreshold:15 },
+    { id:'m8', name:'Warning label',          unit:'unit', costPerUnit:0.08, stock:300, lowThreshold:50 }
+  ];
+
+  var SAMPLE_PRODUCTS = [
+    {
+      id:'p1', name:'Lavender soy candle 8oz', salePrice:18.00,
+      recipe:[
+        {materialId:'m1',qty:0.5},{materialId:'m2',qty:1},
+        {materialId:'m3',qty:1},{materialId:'m4',qty:1},
+        {materialId:'m7',qty:1},{materialId:'m8',qty:1}
+      ]
+    },
+    {
+      id:'p2', name:'Vanilla soy candle 8oz', salePrice:18.00,
+      recipe:[
+        {materialId:'m1',qty:0.5},{materialId:'m2',qty:1},
+        {materialId:'m3',qty:1},{materialId:'m5',qty:1},
+        {materialId:'m7',qty:1},{materialId:'m8',qty:1}
+      ]
+    },
+    {
+      id:'p3', name:'Citrus burst soy candle 8oz', salePrice:20.00,
+      recipe:[
+        {materialId:'m1',qty:0.5},{materialId:'m2',qty:1},
+        {materialId:'m3',qty:1},{materialId:'m6',qty:1},
+        {materialId:'m7',qty:1},{materialId:'m8',qty:1}
+      ]
+    }
+  ];
+
+  /* ── Application state ───────────────────────────────────────── */
+  var state = { materials:[], products:[], orders:[], audit:[] };
+  // confirmPending: id of row pending inline delete confirmation
+  var confirmPending = { material: null, product: null };
+
+  function loadState() {
+    state.materials = loadJson(SK.materials) || null;
+    state.products  = loadJson(SK.products)  || null;
+    state.orders    = loadJson(SK.orders)    || [];
+    state.audit     = loadJson(SK.audit)     || [];
+    if (!state.materials) resetState(false);
+  }
+
+  function saveState() {
+    saveJson(SK.materials, state.materials);
+    saveJson(SK.products,  state.products);
+    saveJson(SK.orders,    state.orders);
+    saveJson(SK.audit,     state.audit);
+  }
+
+  function resetState(addLog) {
+    state.materials = JSON.parse(JSON.stringify(SAMPLE_MATERIALS));
+    state.products  = JSON.parse(JSON.stringify(SAMPLE_PRODUCTS));
+    state.orders    = [];
+    state.audit     = [];
+    if (addLog !== false) {
+      addAudit('reset', 'Demo data reset. 8 materials and 3 products loaded. All orders cleared.');
+    } else {
+      addAudit('reset', 'Demo data loaded for the first time. 8 materials and 3 products ready.');
+    }
+    saveState();
+  }
+
+  /* ── Audit ───────────────────────────────────────────────────── */
+  function addAudit(type, desc) {
+    state.audit.unshift({ id:uid(), ts:new Date().toISOString(), type:type, desc:desc });
+  }
+
+  /* ── COGS calculation ────────────────────────────────────────── */
+  function matMap() {
+    var m = {};
+    state.materials.forEach(function(mat){ m[mat.id] = mat; });
+    return m;
+  }
+
+  function computeCOGS(product) {
+    var map = matMap();
+    var cogs = 0;
+    product.recipe.forEach(function(line){
+      var mat = map[line.materialId];
+      if (mat) cogs += mat.costPerUnit * line.qty;
+    });
+    return cogs;
+  }
+
+  function computeMargin(price, cogs) {
+    if (!price || price <= 0) return 0;
+    return (price - cogs) / price * 100;
+  }
+
+  /* ── Stats ───────────────────────────────────────────────────── */
+  function updateStats() {
+    var lowCount = state.materials.filter(function(m){ return m.stock < m.lowThreshold; }).length;
+    var blocked  = state.audit.filter(function(e){ return e.type === 'duplicate-blocked'; }).length;
+    document.getElementById('stat-products').textContent  = state.products.length;
+    document.getElementById('stat-materials').textContent = state.materials.length;
+    document.getElementById('stat-lowstock').textContent  = lowCount;
+    document.getElementById('stat-orders').textContent    = state.orders.length;
+    document.getElementById('stat-blocked').textContent   = blocked;
+  }
+
+  /* ── Materials render ────────────────────────────────────────── */
+  function renderMaterials() {
+    var tbody = document.getElementById('materials-tbody');
+    if (!tbody) return;
+    if (state.materials.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No materials yet. Add your first material to get started.</p></div></td></tr>';
+      return;
+    }
+    var rows = state.materials.map(function(mat) {
+      var isLow  = mat.stock < mat.lowThreshold;
+      var isPending = confirmPending.material === mat.id;
+      var stockDisp = Number(mat.stock % 1 === 0 ? mat.stock : mat.stock.toFixed(3));
+
+      if (isPending) {
+        return '<tr class="confirm-row" data-id="' + escHtml(mat.id) + '">' +
+          '<td colspan="7"><div class="confirm-row-inner">' +
+          '<span>Delete "' + escHtml(mat.name) + '"?' + (isInRecipe(mat.id) ? ' This material appears in at least one product recipe.' : '') + '</span>' +
+          '<button class="btn btn--danger btn--sm" data-action="confirm-delete-material" data-id="' + escHtml(mat.id) + '">Yes, delete</button>' +
+          '<button class="btn btn--ghost btn--sm"  data-action="cancel-delete-material">Cancel</button>' +
+          '</div></td></tr>';
+      }
+
+      return '<tr data-id="' + escHtml(mat.id) + '">' +
+        '<td>' + escHtml(mat.name) + '</td>' +
+        '<td class="td-mono">' + escHtml(mat.unit) + '</td>' +
+        '<td class="td-mono">' + fmtCurrency(mat.costPerUnit) + '</td>' +
+        '<td class="td-mono">' + stockDisp + ' ' + escHtml(mat.unit) + '</td>' +
+        '<td class="td-mono">' + mat.lowThreshold + ' ' + escHtml(mat.unit) + '</td>' +
+        '<td>' + (isLow ? '<span class="badge badge--low">Low stock</span>' : '<span class="text-slate t-caption">OK</span>') + '</td>' +
+        '<td class="row-actions">' +
+          '<button class="action-link" data-action="edit-material" data-id="' + escHtml(mat.id) + '">Edit</button>' +
+          '<span class="action-sep">|</span>' +
+          '<button class="action-link action-link--danger" data-action="delete-material" data-id="' + escHtml(mat.id) + '">Delete</button>' +
+        '</td></tr>';
+    });
+    tbody.innerHTML = rows.join('');
+  }
+
+  function isInRecipe(materialId) {
+    return state.products.some(function(p){
+      return p.recipe.some(function(r){ return r.materialId === materialId; });
+    });
+  }
+
+  /* ── Products render ─────────────────────────────────────────── */
+  var expandedProduct = null;
+
+  function renderProducts() {
+    var tbody = document.getElementById('products-tbody');
+    if (!tbody) return;
+    if (state.products.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No products yet. Add a product and define its recipe to start tracking COGS.</p></div></td></tr>';
+      return;
+    }
+    var map = matMap();
+    var rows = [];
+    state.products.forEach(function(prod) {
+      var cogs   = computeCOGS(prod);
+      var margin = computeMargin(prod.salePrice, cogs);
+      var ingCount = prod.recipe.length;
+      var hasMissing = prod.recipe.some(function(r){ return !map[r.materialId]; });
+      var isPending = confirmPending.product === prod.id;
+      var isExpanded = expandedProduct === prod.id;
+
+      if (isPending) {
+        rows.push('<tr class="confirm-row" data-id="' + escHtml(prod.id) + '">' +
+          '<td colspan="6"><div class="confirm-row-inner">' +
+          '<span>Delete "' + escHtml(prod.name) + '"?</span>' +
+          '<button class="btn btn--danger btn--sm" data-action="confirm-delete-product" data-id="' + escHtml(prod.id) + '">Yes, delete</button>' +
+          '<button class="btn btn--ghost btn--sm"  data-action="cancel-delete-product">Cancel</button>' +
+          '</div></td></tr>');
+        return;
+      }
+
+      var marginColor = margin >= 60 ? 'color:var(--color-success)' : margin >= 40 ? '' : 'color:var(--color-error)';
+
+      rows.push('<tr data-id="' + escHtml(prod.id) + '">' +
+        '<td>' + escHtml(prod.name) + (hasMissing ? ' <span class="badge badge--warn">Recipe incomplete</span>' : '') + '</td>' +
+        '<td class="td-mono">' + fmtCurrency(prod.salePrice) + '</td>' +
+        '<td class="td-mono">' + fmtCurrency(cogs) + '</td>' +
+        '<td class="td-mono" style="' + marginColor + '">' + fmtPct(margin) + '</td>' +
+        '<td>' + ingCount + ' ingredient' + (ingCount !== 1 ? 's' : '') + '</td>' +
+        '<td class="row-actions">' +
+          '<button class="action-link" data-action="toggle-recipe" data-id="' + escHtml(prod.id) + '">' + (isExpanded ? 'Hide recipe' : 'View recipe') + '</button>' +
+          '<span class="action-sep">|</span>' +
+          '<button class="action-link" data-action="edit-product" data-id="' + escHtml(prod.id) + '">Edit</button>' +
+          '<span class="action-sep">|</span>' +
+          '<button class="action-link action-link--danger" data-action="delete-product" data-id="' + escHtml(prod.id) + '">Delete</button>' +
+        '</td></tr>');
+
+      if (isExpanded) {
+        var detailRows = prod.recipe.map(function(line){
+          var mat = map[line.materialId];
+          if (!mat) return '<tr><td><span class="missing-material">Deleted material</span></td><td class="td-mono">' + line.qty + '</td><td>—</td><td>—</td></tr>';
+          var lineCost = mat.costPerUnit * line.qty;
+          return '<tr>' +
+            '<td>' + escHtml(mat.name) + '</td>' +
+            '<td class="td-mono">' + line.qty + ' ' + escHtml(mat.unit) + '</td>' +
+            '<td class="td-mono">' + fmtCurrency(mat.costPerUnit) + '/' + escHtml(mat.unit) + '</td>' +
+            '<td class="td-mono">' + fmtCurrency(lineCost) + '</td>' +
+            '</tr>';
+        });
+        rows.push('<tr class="recipe-expand-row"><td colspan="6">' +
+          '<table class="recipe-detail-table">' +
+          '<thead><tr><th>Material</th><th>Qty</th><th>Unit cost</th><th>Line cost</th></tr></thead>' +
+          '<tbody>' + detailRows.join('') + '</tbody>' +
+          '<tfoot><tr class="recipe-total-row"><td colspan="3">Total COGS</td><td class="td-mono">' + fmtCurrency(cogs) + '</td></tr></tfoot>' +
+          '</table></td></tr>');
+      }
+    });
+    tbody.innerHTML = rows.join('');
+  }
+
+  /* ── Audit render ────────────────────────────────────────────── */
+  function renderAudit() {
+    var container = document.getElementById('audit-container');
+    if (!container) return;
+    if (state.audit.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No events recorded yet. Record a sale or make a change to see the audit trail.</p></div>';
+      return;
+    }
+    var badgeClass = { 'sale':'badge--sale', 'duplicate-blocked':'badge--block', 'reset':'badge--meta', 'material-added':'badge--meta', 'material-edited':'badge--meta', 'material-deleted':'badge--meta', 'product-added':'badge--meta', 'product-edited':'badge--meta', 'product-deleted':'badge--meta' };
+    var badgeLabel = { 'sale':'sale recorded', 'duplicate-blocked':'duplicate blocked', 'reset':'data reset', 'material-added':'material added', 'material-edited':'material edited', 'material-deleted':'material deleted', 'product-added':'product added', 'product-edited':'product edited', 'product-deleted':'product deleted' };
+    var entries = state.audit.map(function(e) {
+      var cls = e.type === 'duplicate-blocked' ? 'audit-entry audit-entry--blocked' : 'audit-entry';
+      var bc  = badgeClass[e.type] || 'badge--meta';
+      var bl  = badgeLabel[e.type] || e.type;
+      return '<div class="' + cls + '">' +
+        '<span class="audit-ts">' + escHtml(fmtDate(e.ts)) + '</span>' +
+        '<span class="badge ' + bc + '">' + escHtml(bl) + '</span>' +
+        '<span class="audit-desc">' + escHtml(e.desc) + '</span>' +
+        '</div>';
+    });
+    container.innerHTML = '<div class="audit-list">' + entries.join('') + '</div>';
+  }
+
+  /* ── Full render ─────────────────────────────────────────────── */
+  function renderAll() {
+    renderMaterials();
+    renderProducts();
+    renderAudit();
+    updateStats();
+    populateSaleProductSelect();
+  }
+
+  /* ── Tab navigation ──────────────────────────────────────────── */
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var tab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(function(b){
+        b.classList.remove('is-active');
+        b.setAttribute('aria-selected','false');
+      });
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-selected','true');
+      var panel = document.getElementById('panel-' + tab);
+      if (panel) panel.classList.add('is-active');
+    });
+  });
+
+  function switchToTab(tabId) {
+    var btn = document.querySelector('[data-tab="' + tabId + '"]');
+    if (btn) btn.click();
+  }
+
+  /* ── Material modal ──────────────────────────────────────────── */
+  function openMaterialModal(matId) {
+    var modal = document.getElementById('modal-material');
+    var title = document.getElementById('modal-material-title');
+    clearFormErrors('form-material');
+
+    if (matId) {
+      var mat = state.materials.find(function(m){ return m.id === matId; });
+      if (!mat) return;
+      title.textContent = 'Edit material';
+      document.getElementById('mat-id').value        = mat.id;
+      document.getElementById('mat-name').value      = mat.name;
+      document.getElementById('mat-unit').value      = mat.unit;
+      document.getElementById('mat-cost').value      = mat.costPerUnit;
+      document.getElementById('mat-stock').value     = mat.stock;
+      document.getElementById('mat-threshold').value = mat.lowThreshold;
+    } else {
+      title.textContent = 'Add material';
+      document.getElementById('mat-id').value        = '';
+      document.getElementById('mat-name').value      = '';
+      document.getElementById('mat-unit').value      = '';
+      document.getElementById('mat-cost').value      = '';
+      document.getElementById('mat-stock').value     = '';
+      document.getElementById('mat-threshold').value = '';
+    }
+    modal.hidden = false;
+    document.getElementById('mat-name').focus();
+  }
+
+  function closeMaterialModal() {
+    document.getElementById('modal-material').hidden = true;
+  }
+
+  function saveMaterial() {
+    clearFormErrors('form-material');
+    var id    = document.getElementById('mat-id').value.trim();
+    var name  = document.getElementById('mat-name').value.trim();
+    var unit  = document.getElementById('mat-unit').value.trim();
+    var cost  = parseFloat(document.getElementById('mat-cost').value);
+    var stock = parseFloat(document.getElementById('mat-stock').value);
+    var thr   = parseFloat(document.getElementById('mat-threshold').value);
+
+    var valid = true;
+    if (!name)        { showFieldError('mat-name',      'Name is required.');                valid=false; }
+    if (!unit)        { showFieldError('mat-unit',      'Unit is required.');                valid=false; }
+    if (isNaN(cost) || cost <= 0) { showFieldError('mat-cost','Cost per unit must be a positive number.'); valid=false; }
+    if (isNaN(stock) || stock < 0){ showFieldError('mat-stock','Stock must be 0 or greater.');            valid=false; }
+    if (isNaN(thr)  || thr <= 0) { showFieldError('mat-threshold','Threshold must be a positive number.'); valid=false; }
+    if (!valid) return;
+
+    // Check for duplicate name (excluding self)
+    var dup = state.materials.find(function(m){ return m.name.toLowerCase() === name.toLowerCase() && m.id !== id; });
+    if (dup) { showFieldError('mat-name', 'A material named "' + name + '" already exists.'); return; }
+
+    if (id) {
+      var idx = state.materials.findIndex(function(m){ return m.id === id; });
+      var old = state.materials[idx];
+      state.materials[idx] = { id:id, name:name, unit:unit, costPerUnit:cost, stock:stock, lowThreshold:thr };
+      addAudit('material-edited', 'Updated material "' + name + '". Cost: ' + fmtCurrency(old.costPerUnit) + ' → ' + fmtCurrency(cost) + ', Stock: ' + old.stock + ' → ' + stock + ' ' + unit + '.');
+    } else {
+      var newMat = { id:uid(), name:name, unit:unit, costPerUnit:cost, stock:stock, lowThreshold:thr };
+      state.materials.push(newMat);
+      addAudit('material-added', 'Added material "' + name + '" — ' + fmtCurrency(cost) + ' per ' + unit + ', stock: ' + stock + '.');
+    }
+    saveState();
+    closeMaterialModal();
+    renderAll();
+  }
+
+  document.getElementById('btn-add-material').addEventListener('click', function(){ openMaterialModal(null); });
+  document.getElementById('modal-material-close').addEventListener('click', closeMaterialModal);
+  document.getElementById('modal-material-cancel').addEventListener('click', closeMaterialModal);
+  document.getElementById('modal-material-save').addEventListener('click', saveMaterial);
+  document.getElementById('modal-material').addEventListener('click', function(e){ if(e.target===this) closeMaterialModal(); });
+
+  /* ── Product modal ───────────────────────────────────────────── */
+  var recipeRowCount = 0;
+
+  function openProductModal(prodId) {
+    var modal = document.getElementById('modal-product');
+    var title = document.getElementById('modal-product-title');
+    clearFormErrors('form-product');
+    document.getElementById('recipe-rows').innerHTML = '';
+    recipeRowCount = 0;
+
+    if (prodId) {
+      var prod = state.products.find(function(p){ return p.id === prodId; });
+      if (!prod) return;
+      title.textContent = 'Edit product';
+      document.getElementById('prod-id').value    = prod.id;
+      document.getElementById('prod-name').value  = prod.name;
+      document.getElementById('prod-price').value = prod.salePrice;
+      prod.recipe.forEach(function(line){ addRecipeRow(line.materialId, line.qty); });
+    } else {
+      title.textContent = 'Add product';
+      document.getElementById('prod-id').value    = '';
+      document.getElementById('prod-name').value  = '';
+      document.getElementById('prod-price').value = '';
+      addRecipeRow();
+    }
+    updateCOGSPreview();
+    modal.hidden = false;
+    document.getElementById('prod-name').focus();
+  }
+
+  function closeProductModal() {
+    document.getElementById('modal-product').hidden = true;
+  }
+
+  function addRecipeRow(materialId, qty) {
+    var rowId = 'rr-' + (++recipeRowCount);
+    var options = state.materials.map(function(m){
+      var sel = (materialId && m.id === materialId) ? ' selected' : '';
+      return '<option value="' + escHtml(m.id) + '"' + sel + '>' + escHtml(m.name) + ' (' + escHtml(m.unit) + ')</option>';
+    });
+    var div = document.createElement('div');
+    div.className = 'recipe-row';
+    div.id = rowId;
+    div.innerHTML =
+      '<select class="form-select recipe-material" aria-label="Material">' +
+        '<option value="">Select material</option>' +
+        options.join('') +
+      '</select>' +
+      '<input class="form-input recipe-qty" type="number" min="0.001" step="any" placeholder="Qty" aria-label="Quantity" value="' + (qty || '') + '">' +
+      '<button type="button" class="recipe-remove" aria-label="Remove ingredient" data-row="' + rowId + '">&#x2715;</button>';
+    document.getElementById('recipe-rows').appendChild(div);
+    // Events for live COGS
+    div.querySelector('.recipe-material').addEventListener('change', updateCOGSPreview);
+    div.querySelector('.recipe-qty').addEventListener('input', updateCOGSPreview);
+    div.querySelector('.recipe-remove').addEventListener('click', function(){
+      div.remove();
+      updateCOGSPreview();
+    });
+  }
+
+  function updateCOGSPreview() {
+    var map = matMap();
+    var rows = document.querySelectorAll('#recipe-rows .recipe-row');
+    var cogs = 0;
+    var valid = rows.length > 0;
+    rows.forEach(function(row){
+      var matId = row.querySelector('.recipe-material').value;
+      var qty   = parseFloat(row.querySelector('.recipe-qty').value);
+      var mat   = map[matId];
+      if (mat && !isNaN(qty) && qty > 0) cogs += mat.costPerUnit * qty;
+      else valid = false;
+    });
+    var el = document.getElementById('prod-cogs-preview');
+    if (rows.length > 0) {
+      el.hidden = false;
+      document.getElementById('prod-cogs-value').textContent = fmtCurrency(cogs);
+    } else {
+      el.hidden = true;
+    }
+  }
+
+  function saveProduct() {
+    clearFormErrors('form-product');
+    var id    = document.getElementById('prod-id').value.trim();
+    var name  = document.getElementById('prod-name').value.trim();
+    var price = parseFloat(document.getElementById('prod-price').value);
+    var rows  = document.querySelectorAll('#recipe-rows .recipe-row');
+
+    var valid = true;
+    if (!name)  { showFieldError('prod-name','Product name is required.'); valid=false; }
+    if (isNaN(price) || price <= 0) { showFieldError('prod-price','Sale price must be a positive number.'); valid=false; }
+
+    // Parse recipe
+    var recipe = [];
+    rows.forEach(function(row){
+      var matId = row.querySelector('.recipe-material').value;
+      var qty   = parseFloat(row.querySelector('.recipe-qty').value);
+      if (matId && !isNaN(qty) && qty > 0) recipe.push({ materialId:matId, qty:qty });
+    });
+    if (recipe.length === 0) {
+      var err = document.getElementById('prod-recipe-error');
+      err.textContent = 'Add at least one ingredient to the recipe.';
+      err.hidden = false;
+      valid = false;
+    }
+    if (!valid) return;
+
+    // Check for duplicate name
+    var dup = state.products.find(function(p){ return p.name.toLowerCase() === name.toLowerCase() && p.id !== id; });
+    if (dup) { showFieldError('prod-name', 'A product named "' + name + '" already exists.'); return; }
+
+    if (id) {
+      var idx = state.products.findIndex(function(p){ return p.id === id; });
+      state.products[idx] = { id:id, name:name, salePrice:price, recipe:recipe };
+      addAudit('product-edited', 'Updated product "' + name + '" — sale price ' + fmtCurrency(price) + ', ' + recipe.length + ' ingredient(s).');
+    } else {
+      var cogs = 0;
+      var map  = matMap();
+      recipe.forEach(function(l){ var m=map[l.materialId]; if(m) cogs+=m.costPerUnit*l.qty; });
+      state.products.push({ id:uid(), name:name, salePrice:price, recipe:recipe });
+      addAudit('product-added', 'Added product "' + name + '" — sale price ' + fmtCurrency(price) + ', COGS ' + fmtCurrency(cogs) + ', ' + recipe.length + ' ingredient(s).');
+    }
+    saveState();
+    closeProductModal();
+    renderAll();
+  }
+
+  document.getElementById('btn-add-product').addEventListener('click', function(){ openProductModal(null); });
+  document.getElementById('btn-add-recipe-row').addEventListener('click', function(){ addRecipeRow(); });
+  document.getElementById('modal-product-close').addEventListener('click', closeProductModal);
+  document.getElementById('modal-product-cancel').addEventListener('click', closeProductModal);
+  document.getElementById('modal-product-save').addEventListener('click', saveProduct);
+  document.getElementById('modal-product').addEventListener('click', function(e){ if(e.target===this) closeProductModal(); });
+
+  /* ── Delegated table events ──────────────────────────────────── */
+  document.getElementById('materials-table').addEventListener('click', function(e) {
+    var el = e.target.closest('[data-action]');
+    if (!el) return;
+    var action = el.dataset.action;
+    var id     = el.dataset.id;
+    if (action === 'edit-material') { openMaterialModal(id); }
+    else if (action === 'delete-material') {
+      confirmPending.material = id;
+      renderMaterials();
+    }
+    else if (action === 'confirm-delete-material') {
+      var mat = state.materials.find(function(m){ return m.id === id; });
+      state.materials = state.materials.filter(function(m){ return m.id !== id; });
+      if (mat) addAudit('material-deleted', 'Deleted material "' + mat.name + '".');
+      confirmPending.material = null;
+      saveState();
+      renderAll();
+    }
+    else if (action === 'cancel-delete-material') {
+      confirmPending.material = null;
+      renderMaterials();
+    }
+  });
+
+  document.getElementById('products-table').addEventListener('click', function(e) {
+    var el = e.target.closest('[data-action]');
+    if (!el) return;
+    var action = el.dataset.action;
+    var id     = el.dataset.id;
+    if (action === 'toggle-recipe') {
+      expandedProduct = (expandedProduct === id) ? null : id;
+      renderProducts();
+    }
+    else if (action === 'edit-product') { openProductModal(id); }
+    else if (action === 'delete-product') {
+      confirmPending.product = id;
+      renderProducts();
+    }
+    else if (action === 'confirm-delete-product') {
+      var prod = state.products.find(function(p){ return p.id === id; });
+      state.products = state.products.filter(function(p){ return p.id !== id; });
+      if (prod) addAudit('product-deleted', 'Deleted product "' + prod.name + '".');
+      confirmPending.product = null;
+      saveState();
+      renderAll();
+    }
+    else if (action === 'cancel-delete-product') {
+      confirmPending.product = null;
+      renderProducts();
+    }
+  });
+
+  /* ── Sale form ───────────────────────────────────────────────── */
+  function populateSaleProductSelect() {
+    var sel = document.getElementById('sale-product');
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">Select a product</option>';
+    state.products.forEach(function(p){
+      var cogs = computeCOGS(p);
+      var opt  = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name + ' — COGS ' + fmtCurrency(cogs);
+      if (p.id === cur) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    updateSalePreview();
+  }
+
+  function updateSalePreview() {
+    var prodId = document.getElementById('sale-product').value;
+    var qty    = parseInt(document.getElementById('sale-qty').value, 10) || 1;
+    var prev   = document.getElementById('sale-preview');
+    if (!prodId) { prev.classList.remove('is-visible'); return; }
+    var prod = state.products.find(function(p){ return p.id === prodId; });
+    if (!prod) { prev.classList.remove('is-visible'); return; }
+    var map  = matMap();
+    var cogs = computeCOGS(prod) * qty;
+    var lines = prod.recipe.map(function(r){
+      var m = map[r.materialId];
+      if (!m) return '<span style="color:var(--color-error)">deleted material</span>';
+      return (r.qty * qty) + ' ' + escHtml(m.unit) + ' ' + escHtml(m.name);
+    });
+    prev.innerHTML = 'Deduction: ' + lines.join(', ') + '<br>Expected COGS: <strong>' + fmtCurrency(cogs) + '</strong>';
+    prev.classList.add('is-visible');
+  }
+
+  document.getElementById('sale-product').addEventListener('change', updateSalePreview);
+  document.getElementById('sale-qty').addEventListener('input', updateSalePreview);
+
+  // Track whether last sale was a first-time (enable "try again" hint)
+  var lastRecordedOrderId = null;
+
+  document.getElementById('form-sale').addEventListener('submit', function(e) {
+    e.preventDefault();
+    clearFormErrors('form-sale');
+
+    var orderId = document.getElementById('sale-order-id').value.trim();
+    var prodId  = document.getElementById('sale-product').value;
+    var qty     = parseInt(document.getElementById('sale-qty').value, 10);
+
+    var valid = true;
+    if (!orderId) { showFieldError('sale-order-id', 'Order ID is required.'); valid=false; }
+    if (!prodId)  { showFieldError('sale-product',  'Select a product.');     valid=false; }
+    if (!qty || qty < 1) { showFieldError('sale-qty', 'Quantity must be 1 or more.'); valid=false; }
+    if (!valid) return;
+
+    var result = recordSale(orderId, prodId, qty);
+    showSaleResult(result);
+    renderAll();
+  });
+
+  function recordSale(orderId, prodId, qty) {
+    // Idempotency check
+    var existing = state.orders.find(function(o){ return o.orderId === orderId; });
+    if (existing) {
+      addAudit('duplicate-blocked',
+        'Order ' + orderId + ' was already recorded at ' + fmtDate(existing.ts) + '. No materials deducted. No data changed.');
+      saveState();
+      return { blocked: true, original: existing };
+    }
+
+    var prod = state.products.find(function(p){ return p.id === prodId; });
+    if (!prod) return { blocked: false, error: 'Product not found.' };
+
+    var map = matMap();
+    var cogs = 0;
+    var deductions = [];
+    var negativeWarnings = [];
+
+    prod.recipe.forEach(function(line) {
+      var mat = map[line.materialId];
+      if (!mat) return;
+      var deductAmt = line.qty * qty;
+      mat.stock = Math.round((mat.stock - deductAmt) * 1e9) / 1e9; // floating-point safety
+      cogs += mat.costPerUnit * deductAmt;
+      deductions.push((deductAmt % 1 === 0 ? deductAmt : deductAmt.toFixed(3)) + ' ' + mat.unit + ' ' + mat.name);
+      if (mat.stock < 0) negativeWarnings.push(mat.name);
+    });
+
+    // Persist updated stock
+    saveJson(SK.materials, state.materials);
+
+    var order = { orderId:orderId, productId:prodId, qty:qty, ts:new Date().toISOString(), cogs:cogs };
+    state.orders.push(order);
+
+    var desc = 'Order ' + orderId + ': ' + qty + '× ' + prod.name + '. Deducted: ' + deductions.join(', ') + '. COGS: ' + fmtCurrency(cogs) + '.';
+    if (negativeWarnings.length > 0) {
+      desc += ' Stock below zero for: ' + negativeWarnings.join(', ') + '.';
+    }
+    addAudit('sale', desc);
+    saveState();
+
+    lastRecordedOrderId = orderId;
+    return { blocked: false, order:order, cogs:cogs, deductions:deductions, prod:prod, qty:qty, negative:negativeWarnings };
+  }
+
+  function showSaleResult(result) {
+    var el    = document.getElementById('sale-result');
+    var hint  = document.getElementById('repeat-hint');
+    hint.classList.remove('is-visible');
+
+    el.className = 'sale-result is-visible';
+
+    if (result.blocked) {
+      el.classList.add('sale-result--blocked');
+      el.innerHTML =
+        '<div class="sale-result__title">Duplicate blocked.</div>' +
+        '<div class="sale-result__body">' +
+          'Order <span class="mono">' + escHtml(result.original.orderId) + '</span> was already recorded at ' +
+          escHtml(fmtDate(result.original.ts)) + '.<br>' +
+          'No materials were deducted. No data changed.' +
+        '</div>' +
+        '<button class="sale-result__cta" id="sale-goto-audit">View audit trail &#8594;</button>';
+      document.getElementById('sale-goto-audit').addEventListener('click', function(){ switchToTab('audit'); });
+    } else if (result.error) {
+      el.classList.add('sale-result--blocked');
+      el.innerHTML = '<div class="sale-result__title">Could not record sale.</div><div class="sale-result__body">' + escHtml(result.error) + '</div>';
+    } else {
+      el.classList.add('sale-result--success');
+      var negNote = result.negative && result.negative.length > 0
+        ? '<br><span style="color:var(--color-amber)">Stock below zero: ' + escHtml(result.negative.join(', ')) + '. Check your inventory.</span>'
+        : '';
+      el.innerHTML =
+        '<div class="sale-result__title">Order recorded.</div>' +
+        '<div class="sale-result__body">' +
+          'Order <span class="mono">' + escHtml(result.order.orderId) + '</span>: ' + result.qty + '&#215; ' + escHtml(result.prod.name) + '.<br>' +
+          'Deducted: ' + result.deductions.map(escHtml).join(', ') + '.<br>' +
+          'COGS: <span class="mono">' + fmtCurrency(result.cogs) + '</span>.' +
+          negNote +
+        '</div>';
+      // Show repeat hint
+      hint.classList.add('is-visible');
+    }
+  }
+
+  /* ── Form helpers ────────────────────────────────────────────── */
+  function showFieldError(fieldId, msg) {
+    var field = document.getElementById(fieldId);
+    var errId = fieldId + '-error';
+    var err   = document.getElementById(errId);
+    if (field) field.classList.add('is-error');
+    if (err)   { err.textContent = msg; err.hidden = false; }
+  }
+
+  function clearFormErrors(formId) {
+    var form = document.getElementById(formId);
+    if (!form) return;
+    form.querySelectorAll('.is-error').forEach(function(el){ el.classList.remove('is-error'); });
+    form.querySelectorAll('.form-error').forEach(function(el){ el.textContent=''; el.hidden=true; });
+  }
+
+  /* ── Global action: reset ────────────────────────────────────── */
+  document.getElementById('btn-reset').addEventListener('click', function() {
+    // Inline confirm
+    var btn = document.getElementById('btn-reset');
+    if (btn.dataset.confirming) {
+      // Second click: proceed
+      clearTimeout(btn._confirmTimer);
+      delete btn.dataset.confirming;
+      btn.textContent = 'Reset demo data';
+      btn.classList.remove('btn--danger');
+      btn.classList.add('btn--ghost');
+      resetState(true);
+      // Reset sale form
+      document.getElementById('form-sale').reset();
+      document.getElementById('sale-result').className = 'sale-result';
+      document.getElementById('repeat-hint').classList.remove('is-visible');
+      document.getElementById('sale-preview').classList.remove('is-visible');
+      lastRecordedOrderId = null;
+      expandedProduct = null;
+      confirmPending.material = null;
+      confirmPending.product  = null;
+      renderAll();
+    } else {
+      // First click: ask for confirmation
+      btn.dataset.confirming = '1';
+      btn.textContent = 'Confirm reset';
+      btn.classList.remove('btn--ghost');
+      btn.classList.add('btn--danger');
+      btn._confirmTimer = setTimeout(function(){
+        delete btn.dataset.confirming;
+        btn.textContent = 'Reset demo data';
+        btn.classList.remove('btn--danger');
+        btn.classList.add('btn--ghost');
+      }, 4000);
+    }
+  });
+
+  /* ── CSV export (audit log) ──────────────────────────────────── */
+  function exportAuditCSV() {
+    var rows = [['Timestamp','Type','Description']];
+    state.audit.forEach(function(e){
+      rows.push([
+        e.ts,
+        e.type,
+        '"' + e.desc.replace(/"/g,'""') + '"'
+      ]);
+    });
+    var csv = rows.map(function(r){ return r.join(','); }).join('\r\n');
+    downloadFile('batchcogs-audit-' + new Date().toISOString().slice(0,10) + '.csv', 'text/csv', csv);
+  }
+
+  function downloadFile(filename, mime, content) {
+    var blob = new Blob([content], { type: mime + ';charset=utf-8;' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href     = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1000);
+  }
+
+  document.getElementById('btn-export-csv').addEventListener('click', exportAuditCSV);
+  document.getElementById('btn-export-audit').addEventListener('click', function(){
+    switchToTab('audit');
+    exportAuditCSV();
+  });
+
+  /* ── Keyboard: Escape closes modals ─────────────────────────── */
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Escape') return;
+    if (!document.getElementById('modal-material').hidden) { closeMaterialModal(); return; }
+    if (!document.getElementById('modal-product').hidden)  { closeProductModal();  return; }
+  });
+
+  /* ── Bootstrap ───────────────────────────────────────────────── */
+  loadState();
+  renderAll();
+
+}());
+</script>
+</body>
+</html>

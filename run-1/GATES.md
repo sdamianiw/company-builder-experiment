@@ -11,7 +11,7 @@ Single source of truth for gate status. Updated at every phase close; a RED gate
 | G3a | RED | Business thesis claims 100% URL-traced | skeptic pass on thesis | **PASS 2026-07-23 (after fixing 3 flags; see BUILD-LOG + verification/thesis-check.md)** |
 | G3b | AMBER | Brand guidelines complete (stranger test) + voice-rules.md exists | checklist in brand/ | **PASS 2026-07-23 (guidelines, 2 logos, voice-rules w/ inference label)** |
 | G3c | AMBER | Domain availability checked via RDAP, receipt saved | evidence file | **PASS 2026-07-23: batchcogs.com RDAP 404 (available), receipts in brand/naming.md** |
-| G4 | RED | Site opens locally, 390px+1440px screenshots reviewed, 0 console errors | `node tools/screenshot.mjs` (exit 3 on console errors) | pending |
+| G4 | RED | Site opens locally, 390px+1440px screenshots reviewed, 0 console errors | `node tools/screenshot.mjs` (exit 3 on console errors) + `tools/demo-test.mjs` | **PASS 2026-07-24: 12 shots clean, calculator bug caught+fixed, demo idempotency functionally proven** |
 | G5 | RED | Both videos render, play, frames watched | `tools/encode-video.mjs` VERIFY + frame review | pending |
 | G5b | AMBER | Founder script passes voice-rules checklist | brand/voice-rules.md checklist | pending |
 | G6 | RED | recap.html + docs: 0 broken links | `node tools/linkcheck.mjs` → `broken=0` | pending |
