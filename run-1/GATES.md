@@ -14,10 +14,10 @@ Single source of truth for gate status. Updated at every phase close; a RED gate
 | G4 | RED | Site opens locally, 390px+1440px screenshots reviewed, 0 console errors | `node tools/screenshot.mjs` (exit 3 on console errors) + `tools/demo-test.mjs` | **PASS 2026-07-24: 12 shots clean, calculator bug caught+fixed, demo idempotency functionally proven** |
 | G5 | RED | Both videos render, play, frames watched | `tools/encode-video.mjs` VERIFY + frame review | **PASS 2026-07-24: 45s+40s mp4s, 9 sampled frames reviewed from encoded output** |
 | G5b | AMBER | Founder script passes voice-rules checklist | brand/voice-rules.md checklist | **PASS 2026-07-24 (rule-by-rule author check + frame spot-check)** |
-| G6 | RED | recap.html + docs: 0 broken links | `node tools/linkcheck.mjs` → `broken=0` | pending |
-| G7 | RED | 0 placeholders in deliverables | grep TODO/lorem/FIXME/placeholder → 0 hits | pending |
-| G8 | RED | Red-team objections visible verbatim in final docs | red-team doc linked from recap | pending |
-| G9 | RED | Guardrail audit: each of 5 guardrails → evidence it held | audit section in recap | pending |
+| G6 | RED | recap.html + docs: 0 broken links | `node tools/linkcheck.mjs` → `broken=0` | **PASS 2026-07-24: checked=118 broken=0 (9 bot-blocked 403s listed w/ receipts)** |
+| G7 | RED | 0 placeholders in deliverables | grep draft-markers → 0 hits (HTML placeholder= attributes and styling terms excluded as legitimate) | **PASS 2026-07-24: 0 hits** |
+| G8 | RED | Red-team objections visible verbatim in final docs | red-team doc linked from recap | **PASS 2026-07-24: 22 objections verbatim in red-team.md, 16 open, linked from recap §5** |
+| G9 | RED | Guardrail audit: each of 5 guardrails → evidence it held | audit section in recap | **PASS 2026-07-24: recap §6 table, incl. disclosed nuance (private brand-preview artifact)** |
 
 ## G1 decision rule (pre-committed 2026-07-23)
 ≥4 VERIFIED → pass, P2. · 2–3 → proceed with narrower tournament, log cut. · <2 → ONE targeted mini-sweep (≤3 agents), then proceed with best available, honestly labeled. Never a full round 3.

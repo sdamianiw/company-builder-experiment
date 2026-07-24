@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BatchCOGS — run-1 recap</title>
+<meta name="description" content="Five-minute recap of the BatchCOGS company package: the verified pain, the product, the evidence, the red team, and how to run everything locally.">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+  .recap-wrap { max-width: 880px; margin: 0 auto; padding: 48px 20px; }
+  .recap-h1 { font-family: var(--font-display, serif); font-size: 2.2rem; margin: 0 0 8px; }
+  .recap-section { margin-top: 44px; }
+  .recap-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .recap-table th, .recap-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #e4ebf0; vertical-align: top; }
+  .recap-kicker { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: #7a9baa; }
+  .pass { color: #1c6b3c; font-weight: 600; }
+  .open { color: #a05a00; font-weight: 600; }
+  .quote { border-left: 3px solid #d4911f; padding: 6px 14px; margin: 10px 0; font-style: italic; }
+  code { font-family: var(--font-mono, monospace); font-size: .85em; background: #f0f3f5; padding: 1px 5px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="recap-wrap">
+
+  <p class="recap-kicker">run-1 · built autonomously · 2026-07-11 → 2026-07-24</p>
+  <h1 class="recap-h1">BatchCOGS — the whole package in five minutes</h1>
+  <p>Recipe-based COGS and inventory tracking for handmade sellers on Etsy and Shopify, at $19/month.
+  This page links every deliverable and states plainly what is verified, what is inference, and what the red team could not resolve.</p>
+
+  <div class="recap-section">
+    <h2>1. The pain (verified, primary sources)</h2>
+    <p>Handmade sellers need materials to auto-deduct when a sale comes in, and real per-unit COGS for pricing and taxes.
+    The segment leader, Craftybase — rebranded Stocksmith in July 2026 — gates that feature ("Automated production assemblies") at its Indie tier,
+    <strong>$83–99/month</strong> (<a href="https://stocksmith.io/pricing">stocksmith.io/pricing</a>, re-verified live 2026-07-24).
+    Cheaper Stocksmith tiers exist (Pro $20, Studio $41–49) but are not documented to include it.</p>
+    <div class="quote">"Having materials automatically deduct when I sell a product is very basic functionality that I should not have to pay $1,000 / year to have" — Liza K., <a href="https://www.capterra.com/p/144117/Craftybase/reviews/">Capterra review of Craftybase/Stocksmith</a></div>
+    <div class="quote">"I felt like legacy clients had quite a shock when the price went up x5 (literally my price went up that much)" — Raven T., <a href="https://www.capterra.com/p/144117/Craftybase/reviews/">same source</a> (quoted as the reviewer's own experience, not our figure)</div>
+    <p>The sub-$25 alternatives all exist and all fail this persona in a documented way: Inventora ($23/mo) has
+    <a href="https://apps.shopify.com/inventora/reviews">Shopify App Store reviews</a> reporting sync duplication and overselling during flash sales;
+    Ardent Seller ($19/mo) is Etsy-only with zero independent software reviews; FormulaLedger ($19/mo) has no sales-channel integration.
+    Full adjudication: <a href="evidence/verification/r2-rank-3-narrowed.md">narrowed re-verification</a> and
+    <a href="evidence/verification/external-pushback-audit.md">external push-back audit</a>.</p>
+  </div>
+
+  <div class="recap-section">
+    <h2>2. The product</h2>
+    <p><strong>Try it now:</strong> <a href="site/demo.html">the working demo</a> (browser-only, localStorage) — materials library, recipe builder,
+    and the reliability showpiece: submit the same order ID twice and the duplicate is blocked and logged, not double-deducted.
+    That guard is functionally proven headlessly (<code>tools/demo-test.mjs</code> → 1 recorded, 1 blocked).</p>
+    <p>Site: <a href="site/index.html">landing</a> · <a href="site/pricing.html">pricing</a> ·
+    <a href="site/compare.html">honest comparison</a> · <a href="site/switch.html">switching kit</a> ·
+    <a href="site/calculator.html">free COGS calculator</a>. Static, zero build step — double-click any file.</p>
+    <p>Pricing: Free tier (20 materials / 30 orders/mo) · Pro $19/mo · Pro Annual $180/yr, anchored against Stocksmith Indie at $990/yr for the auto-deduction feature. Rationale: <a href="business/pricing.md">pricing.md</a>.</p>
+  </div>
+
+  <div class="recap-section">
+    <h2>3. Watch</h2>
+    <p><a href="video/launch.mp4">Launch video</a> (45s, 1280×720, voiced) — the price-hike villain, the product, the duplicate-blocked moment, the $19 vs $990 anchor.<br>
+    <a href="video/founder.mp4">Founder video</a> (40s, voiced) — why this was built, including one honest limitation. Script gated by <a href="brand/voice-rules.md">the written voice rules</a>.</p>
+  </div>
+
+  <div class="recap-section">
+    <h2>4. The business case, honestly framed</h2>
+    <p><a href="business/thesis.md">Thesis</a> · <a href="business/competitor-map.md">competitor map</a> · <a href="evidence/pitch-etsy-cogs.md">winning tournament pitch</a>.
+    Market context: Etsy reports 5.6M marketplace active sellers as of Dec 31, 2024 (<a href="https://www.sec.gov/Archives/edgar/data/1370637/000137063725000017/etsy-20241231.htm">Etsy 10-K, SEC</a>).
+    The share who self-make from raw materials is <em>unverified</em>, so all TAM math is labeled inference on top of that unknown.
+    The realistic 18-month outcome stated in the thesis is 500–1,000 paying users ($114k–$228k ARR) — inference, not forecast.</p>
+    <p>Why now: the July 2026 rebrand created a displacement window for auto-deduction users; the honest moat assessment is thin and time-bounded (12–24 months) — reliability reputation + data switching cost + migration tooling, earned not assumed.</p>
+  </div>
+
+  <div class="recap-section">
+    <h2>5. The red team tried to kill it</h2>
+    <p><a href="red-team.md">red-team.md</a>: 22 objections across business, product, and economics lenses — verbatim, with honest responses.
+    <strong>2 answered, 4 mitigated, 16 open.</strong> The open ones are open on purpose; the sharpest:</p>
+    <ul>
+      <li>Multiple young entrants (FormulaLedger, Batchforja, Ardent Seller) are attacking this same wedge now; the moat window may be shorter than 12 months.</li>
+      <li>A segment defined by refusing $49/month may cap willingness-to-pay near $9–15, not $19.</li>
+      <li>Etsy Commercial Access is a manual approval gate — apply on build day one; CSV import is the fallback (<a href="https://developers.etsy.com/documentation/">Etsy docs</a>).</li>
+      <li>Whether Stocksmith Studio ($41–49) quietly includes auto-deduction is the largest unresolved factual question — a trial account test resolves it before launch.</li>
+      <li>Seasonal churn (Q4 peak → January cancellations) and a Germany-based founder serving a US-centric segment are structural frictions.</li>
+    </ul>
+    <p>Two red-team findings were defects in this package itself and were fixed, not filed: the switching kit now states plainly that one-click CSV import ships in the first 60 days (not day one), and its field map now describes ID-based (not title-based) product linking.</p>
+  </div>
+
+  <div class="recap-section">
+    <h2>6. Guardrail audit (G9)</h2>
+    <table class="recap-table">
+      <tr><th>Guardrail</th><th>Evidence it held</th></tr>
+      <tr><td>1 · No new spending</td><td>No paid service, signup, or purchase anywhere in the run. Domain checked via free RDAP only (<a href="brand/naming.md">receipts</a>: batchcogs.com HTTP 404 = available, not registered). The master prompt's premium media APIs had no keys in this environment → cut to free local tooling (Playwright Chromium, ffmpeg-static, Windows TTS), logged in <a href="BUILD-LOG.md">BUILD-LOG</a>.</td></tr>
+      <tr><td>2 · Publish nothing</td><td>Everything is local files + a local-only git repo. No deploys, no posts, no emails or messages to anyone. One nuance disclosed: a brand-preview page was rendered to the builder's claude.ai artifact space, which is default-private to this account and was never shared.</td></tr>
+      <tr><td>3 · Invent nothing</td><td>Every load-bearing claim carries a fetched URL; adversarial skeptics re-verified them (<a href="evidence/verification/thesis-check.md">thesis check</a>). Two draft stats failed verification and were excised/re-sourced (an unresolvable grabon.com citation → replaced by the SEC 10-K; an untraceable "80%" stat → removed and marked unverified). Inference is labeled inference throughout.</td></tr>
+      <tr><td>4 · Everything in run-1/</td><td>All deliverables live under <code>run-1/</code> (this file's folder), checkpointed phase-by-phase in the local git history.</td></tr>
+      <tr><td>5 · Never ask the user</td><td>Zero questions asked across the run. Every fork was resolved by research or pre-committed decision rules and logged with reasoning in <a href="BUILD-LOG.md">BUILD-LOG.md</a> (including two gate failures and their fixes).</td></tr>
+    </table>
+  </div>
+
+  <div class="recap-section">
+    <h2>7. Self-grade vs the definition of done</h2>
+    <table class="recap-table">
+      <tr><th>Check</th><th>Status</th></tr>
+      <tr><td>Every guardrail held</td><td class="pass">PASS (table above)</td></tr>
+      <tr><td>Every thesis claim has a live URL</td><td class="pass">PASS — skeptic-checked; Capterra/SoftwareAdvice respond 403 to bots but their quoted content was fetched and verified this week (receipts in <a href="evidence/verification/">evidence/verification/</a>)</td></tr>
+      <tr><td>Site screenshot-verified mobile + desktop, no console errors</td><td class="pass">PASS — 12 screenshots at 390px/1440px in <a href="evidence/screenshots/">evidence/screenshots/</a>; the gate caught one real bug (calculator) which was fixed and re-shot</td></tr>
+      <tr><td>Both videos render and were actually watched</td><td class="pass">PASS — 9 frames extracted from the encoded mp4s and reviewed</td></tr>
+      <tr><td>Founder script passes the voice rules</td><td class="pass">PASS — rule-by-rule check against <a href="brand/voice-rules.md">voice-rules.md</a> (rules are self-defined and labeled inference: none existed in this environment)</td></tr>
+      <tr><td>Recap links all work</td><td class="pass">PASS — <code>node tools/linkcheck.mjs recap.html ...</code> → broken=0 (bot-blocked URLs reported separately with receipts)</td></tr>
+      <tr><td>Brand guidelines complete enough for a stranger</td><td class="pass">PASS — <a href="brand/guidelines.md">guidelines</a>, <a href="brand/logo.svg">logo</a> (+ dark), palette, type, voice</td></tr>
+      <tr><td>Red-team objections visible in final docs</td><td class="pass">PASS — 22 verbatim in <a href="red-team.md">red-team.md</a>, 16 marked open</td></tr>
+      <tr><td>Nothing is unfinished or stubbed</td><td class="pass">PASS — automated sweep for draft-marker tokens over all deliverables = 0 hits</td></tr>
+      <tr><td>Research bar (≥4 independently VERIFIED pain-wedges)</td><td class="open">PARTIAL — 2 wedges survived adversarial verification after 2 full hunts + 1 re-verify round (28 → 8 → 0; 6 → 5 → 2). The bar was lowered by pre-committed decision rule rather than by softening the verifier; the cut is logged in <a href="GATES.md">GATES.md</a> and BUILD-LOG. Smaller-and-real over grand-and-plausible, per the mission.</td></tr>
+    </table>
+  </div>
+
+  <div class="recap-section">
+    <h2>8. Run it yourself</h2>
+    <p>Everything is static. Open <code>site/index.html</code> (double-click) → click "Try the demo" → record a sale twice with the same order ID.
+    Play <code>video/launch.mp4</code>. Read <code>red-team.md</code> before believing anything.
+    The full decision log, including both gate failures and what they changed, is <a href="BUILD-LOG.md">BUILD-LOG.md</a>; gate status is <a href="GATES.md">GATES.md</a>.</p>
+    <p class="recap-kicker">Built from the open internet with no budget, no accounts, and no human answers — every claim traceable or labeled.</p>
+  </div>
+
+</div>
+</body>
+</html>
